@@ -1,5 +1,5 @@
 import amqp from 'amqplib';
-import { upsert } from '../es/indexer';
+import { upsert } from '../es/indexer.js';
 
 export async function startConsumer(): Promise<void> {
     const url = process.env.RABBITMQ_URL as string;

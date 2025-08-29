@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { es, INDEX } from '../es/client';
+import { es, INDEX } from '../es/client.js';
 
 const router = Router();
 

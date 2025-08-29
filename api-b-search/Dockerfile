@@ -11,4 +11,4 @@ WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=build /app /app
 EXPOSE 3001
-CMD ["node", "src/app.js"]
+CMD ["node", "--loader", "ts-node/esm", "src/app.ts"]

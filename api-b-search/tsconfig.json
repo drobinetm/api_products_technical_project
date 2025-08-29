@@ -2,24 +2,22 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ES2020",
-    "moduleResolution": "Bundler",
+    "moduleResolution": "Node",
     "outDir": "dist",
-    "rootDir": "src",
+    "rootDir": ".",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "baseUrl": ".",
     "paths": {
       "@src/*": ["src/*"]
     },
     "useUnknownInCatchVariables": false,
-    "types": ["vitest/globals"],
+    "types": ["vitest/globals"]
   },
   "ts-node": {
-    "swc": true,
-    "require": [
-      "tsconfig-paths/register",
-      "./config.ts"
-    ],
+    "esm": true,
+    "swc": true
   },
   "include": [
     "src/**/*.ts",

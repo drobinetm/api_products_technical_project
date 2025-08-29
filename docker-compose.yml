@@ -1,4 +1,4 @@
-version: "1.0"
+version: "3.9"
 services:
   mongodb:
     image: mongo:7
@@ -40,7 +40,9 @@ services:
         condition: service_healthy
 
   api-a-core:
-    build: ./api-a-core
+    build:
+      context: .
+      dockerfile: ./api-a-core/Dockerfile
     env_file: ./api-a-core/.env.example
     depends_on:
       mongodb:

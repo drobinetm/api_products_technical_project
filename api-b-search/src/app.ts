@@ -1,8 +1,8 @@
 import 'dotenv/config';
 import express from 'express';
-import searchRoutes from './routes/search';
-import { ensureIndex } from './es/client';
-import { startConsumer } from './bus/consumer';
+import searchRoutes from './routes/search.js';
+import { ensureIndex } from './es/client.js';
+import { startConsumer } from './bus/consumer.js';
 
 async function main() {
     const app = express();
