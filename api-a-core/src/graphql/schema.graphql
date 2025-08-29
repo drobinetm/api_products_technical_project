@@ -1,0 +1,52 @@
+type Product {
+    id: ID!
+    gs1Id: String!
+    name: String
+    description: String
+    brand: String
+    manufacturer: String
+    netWeight: String
+    status: String
+    createdByRole: String
+    createdAt: String
+    updatedAt: String
+    history: [AuditLog!]  # resolvemos bajo demanda
+}
+
+type AuditLog {
+    id: ID!
+    action: String!
+    changedBy: String
+    before: JSON
+    after: JSON
+    createdAt: String
+}
+
+scalar JSON
+
+input ProductInput {
+    gs1Id: String!
+    name: String!
+    description: String
+    brand: String
+    manufacturer: String
+    netWeight: String
+}
+
+input ProductPatch {
+    name: String
+    description: String
+    brand: String
+    manufacturer: String
+    netWeight: String
+}
+
+type Query {
+    product(id: ID!): Product
+}
+
+type Mutation {
+    createProduct(input: ProductInput!): Product
+    updateProduct(id: ID!, patch: ProductPatch!): Product
+    approveProduct(id: ID!): Product
+}
