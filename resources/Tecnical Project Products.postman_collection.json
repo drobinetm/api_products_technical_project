@@ -1,0 +1,161 @@
+{
+	"info": {
+		"_postman_id": "f84d049d-5bdb-4317-b1cc-c8117472999e",
+		"name": "Tecnical Project Products",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "39894829"
+	},
+	"item": [
+		{
+			"name": "API A – Core (GraphQL)",
+			"item": [
+				{
+					"name": "Health",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": "http://localhost:4000/health"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Products",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation ($in: ProductInput!) {\n  createProduct(input: $in) {\n    id\n    status\n    gs1Id\n    name\n  }\n}\n",
+								"variables": "{\n    \"in\": {\n        \"gs1Id\": \"GS1-003\",\n        \"name\": \"Gel Acondicionador 500ml\",\n        \"brand\": \"Gel\",\n        \"description\": \"Gel para el cabello rizado\",\n        \"manufacturer\": \"Channel SA\",\n        \"netWeight\": \"500ml\"\n    }\n}"
+							}
+						},
+						"url": "http://localhost:4000/graphql"
+					},
+					"response": []
+				},
+				{
+					"name": "Aprobar Product",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-role",
+								"value": "EDITOR",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation {\n  approveProduct(id: \"68b3101217c36f2a87b50d34\") {\n    id\n    status\n    updatedAt\n  }\n}\n",
+								"variables": ""
+							}
+						},
+						"url": "http://localhost:4000/graphql"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Product",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation ($id: ID!, $patch: ProductPatch!) {\n  updateProduct(id: $id, patch: $patch) {\n    id\n    name\n    updatedAt\n  }\n}\n",
+								"variables": "{\n    \"id\": \"68b2f66d17c36f2a87b50d20\",\n    \"patch\": {\n        \"name\": \"New Coffee\",\n        \"manufacturer\": \"MyPyme Koli\"\n    }\n}"
+							}
+						},
+						"url": "http://localhost:4000/graphql"
+					},
+					"response": []
+				},
+				{
+					"name": "List Products Pagination",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query ($limit: Int, $page: Int) {\n  products(limit: $limit, page: $page) {\n    total\n    page\n    pages\n    items {\n      id\n      name\n      status\n    }\n  }\n}\n",
+								"variables": "{\n    \"limit\": 1,\n    \"page\": 1\n}"
+							}
+						},
+						"url": "http://localhost:4000/graphql"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Product By ID",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\n  product(id: \"68b3101217c36f2a87b50d34\") {\n    gs1Id\n    name\n    brand\n    status\n    description\n    updatedAt\n    history {\n      action\n      changedBy\n      before\n      after\n      createdAt\n    }\n  }\n}\n",
+								"variables": ""
+							}
+						},
+						"url": "http://localhost:4000/graphql"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "API B – Search (REST)",
+			"item": [
+				{
+					"name": "Health",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": "http://localhost:3001/health"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Product",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3001/search?q=agua",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "agua"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

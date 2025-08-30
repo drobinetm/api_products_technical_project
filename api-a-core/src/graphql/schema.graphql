@@ -10,7 +10,7 @@ type Product {
     createdByRole: String
     createdAt: String
     updatedAt: String
-    history: [AuditLog!]  # resolvemos bajo demanda
+    history: [AuditLog!]
 }
 
 type AuditLog {
@@ -41,12 +41,25 @@ input ProductPatch {
     netWeight: String
 }
 
+type ProductsResponse {
+    total: Int!
+    page: Int!
+    pages: Int!
+    items: [Product!]!
+}
+
 type Query {
     product(id: ID!): Product
+    products(page: Int = 1, limit: Int = 10): ProductsResponse!
+}
+
+type ClearResult {
+    success: Boolean!
 }
 
 type Mutation {
     createProduct(input: ProductInput!): Product
     updateProduct(id: ID!, patch: ProductPatch!): Product
     approveProduct(id: ID!): Product
+    clearProducts: ClearResult!
 }

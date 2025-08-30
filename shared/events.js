@@ -2,6 +2,8 @@ export const EVENT_TYPES = {
     PRODUCT_CREATED: 'product.created',
     PRODUCT_UPDATED: 'product.updated',
     PRODUCT_APPROVED: 'product.approved',
+    PRODUCT_DELETED: 'product.deleted',
+    PRODUCTS_CLEARED: 'product.cleared',
 };
 
 export function productEventPayload(product) {

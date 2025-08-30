@@ -1,5 +1,5 @@
 import amqp from 'amqplib';
-import { upsert } from '../es/indexer.js';
+import { upsert, clearIndex } from '../es/indexer.js';
 
 export async function startConsumer(): Promise<void> {
     const url = process.env.RABBITMQ_URL as string;
@@ -15,7 +15,17 @@ export async function startConsumer(): Promise<void> {
     ch.consume(queue, async (msg) => {
         try {
             const content = JSON.parse(msg!.content.toString());
-            await upsert(content);
+            const routingKey = msg!.fields.routingKey;
+            
+            if (routingKey === 'product.cleared') {
+                // Clear all products from search index
+                await clearIndex();
+                console.log('Cleared search index');
+            } else {
+                // Regular product upsert
+                await upsert(content);
+            }
+            
             ch.ack(msg!);
         } catch (e) {
             console.error(e);

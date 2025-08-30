@@ -71,6 +71,48 @@ export async function approveProduct(id, user) {
     return updated;
 }
 
+export async function clearProducts() {
+    await Product.deleteMany({});
+    // Also clear audit logs
+    const AuditLog = (await import('../models/AuditLog.js')).default;
+    await AuditLog.deleteMany({});
+    
+    // Publish clear event to update search index
+    await publishEvent({
+        url: bus.url,
+        exchange: bus.exchange,
+        routingKey: EVENT_TYPES.PRODUCTS_CLEARED,
+        payload: { action: 'clear_all' },
+    });
+    
+    return { success: true };
+}
+
+export async function getAllProducts(page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+    const total = await Product.countDocuments();
+    const items = await Product.find()
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean();
+    
+    const pages = Math.ceil(total / limit);
+    
+    // Map MongoDB _id to GraphQL id field
+    const mappedItems = items.map(item => ({
+        ...item,
+        id: item._id.toString(),
+    }));
+    
+    return {
+        total,
+        page,
+        pages,
+        items: mappedItems,
+    };
+}
+
 export async function getProductWithHistory(id) {
     const ProductModel = (await import('../models/Product.js')).default;
     const AuditLog = (await import('../models/AuditLog.js')).default;
