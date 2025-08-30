@@ -12,6 +12,12 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     ports: [ "5672:5672", "15672:15672" ]
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    command: >
+      sh -c "rabbitmq-plugins enable --offline rabbitmq_management &&
+             rabbitmq-server"
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
       interval: 10s
@@ -38,6 +44,11 @@ services:
     depends_on:
       elasticsearch:
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -sf http://localhost:5601/api/status | grep -q 'available'" ]
+      interval: 10s
+      timeout: 5s
+      retries: 30
 
   api-a-core:
     build:

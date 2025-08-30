@@ -1,8 +1,10 @@
 import { Client } from '@elastic/elasticsearch';
+
 const ELASTIC_URL = process.env.ELASTIC_URL;
 if (!ELASTIC_URL) {
     throw new Error('ELASTIC_URL environment variable is not defined');
 }
+
 export const es = new Client({ node: ELASTIC_URL });
 export const INDEX = 'products' as const;
 
@@ -53,12 +55,4 @@ export async function ensureIndex(): Promise<void> {
     if (!exists) {
         await createIndexWithSettings();
     }
-}
-
-export async function resetIndex(): Promise<void> {
-    const exists = await es.indices.exists({ index: INDEX });
-    if (exists) {
-        await es.indices.delete({ index: INDEX });
-    }
-    await createIndexWithSettings();
 }

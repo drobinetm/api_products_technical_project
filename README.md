@@ -1,49 +1,53 @@
-# Products API Technical Test
+# Prueba Técnica de API de Productos
 
-A microservices-based product management system with GraphQL API, real-time search indexing via RabbitMQ, and Elasticsearch-powered search capabilities.
+Un sistema de gestión de productos basado en microservicios con API GraphQL, indexación en tiempo real mediante RabbitMQ y capacidades de búsqueda con Elasticsearch.
 
-## Architecture
+## Arquitectura
 
-- **API-A-Core**: GraphQL API for product management (Node.js)
-- **API-B-Search**: RESTful search API with Elasticsearch (TypeScript/Node.js)
-- **Database**: MongoDB for product storage
-- **Search Engine**: Elasticsearch for full-text search
-- **Message Queue**: RabbitMQ for real-time search indexing
+- **API-A-Core**: API GraphQL para gestión de productos (Node.js)
+- **API-B-Search**: API RESTful de búsqueda con Elasticsearch (TypeScript/Node.js)
+- **Base de datos**: MongoDB para almacenamiento de productos
+- **Motor de búsqueda**: Elasticsearch para búsqueda de texto completo
+- **Cola de mensajes**: RabbitMQ para indexación en tiempo real
 
-## Prerequisites
+<img src="resources/images/1.png" alt="arquitecture">
 
-Make sure you have the following installed:
+## Diagrama de Secuencia
 
-- Node.js (v16+)
+<img src="resources/images/2.png" alt="sequence">
+
+## Requisitos Previos
+
+Asegúrate de tener instalado:
+
+- Node.js (v20+)
 - MongoDB
 - Elasticsearch
 - RabbitMQ
-- npm or yarn
+- npm (v10+)
 
-## Project Structure
+## Estructura del Proyecto
 
 ```
 .
-├── api-a-core/          # GraphQL API service
-├── api-b-search/        # Search API service
-├── resources/           # Scripts and utilities
-├── shared/              # Shared event definitions
-└── docker-compose.yml   # Docker services (optional)
+├── api-a-core/          # Servicio de API GraphQL
+├── api-b-search/        # Servicio de API de búsqueda
+├── resources/           # Scripts y utilidades
+├── shared/              # Definiciones de eventos compartidos
+└── docker-compose.yml   # Servicios Docker (opcional)
 ```
 
-## Installation
+## Ejecutando la Aplicación
 
-### 1. Clone and Install Dependencies
+### Opción 1: Local
 
-```bash
-# Install dependencies for both services
-cd api-a-core && npm install
-cd ../api-b-search && npm install
-```
-
-### 2. Environment Configuration
+#### Configuración del Entorno
 
 **API-A-Core** (`api-a-core/.env`):
+
+> [!IMPORTANT]
+> Copia el contenido del archivo `api-a-core/local.env.example` a `api-a-core/.env` y actualiza los valores según sea necesario.
+
 ```bash
 NODE_ENV=development
 MONGO_URI=mongodb://localhost:27017/products
@@ -54,6 +58,10 @@ PORT=4000
 ```
 
 **API-B-Search** (`api-b-search/.env`):
+
+> [!IMPORTANT]
+> Copia el contenido del archivo `api-b-core/local.env.example` a `api-b-core/.env` y actualiza los valores según sea necesario.
+
 ```bash
 NODE_ENV=development
 ELASTIC_URL=http://localhost:9200
@@ -63,116 +71,73 @@ RABBITMQ_QUEUE=products-search
 PORT=3001
 ```
 
-### 3. Start Required Services
+#### Linux: Configuración Automatizada
 
-Make sure these services are running:
+> [!NOTE]
+> Para sistemas Linux (Ubuntu/Debian/Linux Mint), usa los scripts proporcionados:
 
+**1. Instalar, configurar e iniciar todos los servicios:**
 ```bash
-# MongoDB (usually runs as a service)
-sudo systemctl start mongod
-
-# Elasticsearch (usually runs as a service)
-sudo systemctl start elasticsearch
-
-# RabbitMQ (usually runs as a service)
-sudo systemctl start rabbitmq-server
+# Instalar MongoDB, Elasticsearch, RabbitMQ y Node.js
+chmod +x resources/quick-start.sh
+./resources/quick-start.sh
 ```
 
-Verify services are running:
-```bash
-# Check MongoDB
-mongosh --eval "db.adminCommand('ping')"
+**2. Iniciar las APIs (en terminales separadas):**
 
-# Check Elasticsearch
-curl http://localhost:9200/_cluster/health
-
-# Check RabbitMQ
-sudo rabbitmqctl status
-```
-
-## Running the Application
-
-### Option 1: Local Development
-
-#### Linux: Automated Setup (Recommended)
-
-For Linux systems (Ubuntu/Debian/Linux Mint), use the provided scripts:
-
-**1. Install and configure all services:**
-```bash
-# Install MongoDB, Elasticsearch, RabbitMQ, and Node.js
-chmod +x resources/linux/setup_dev_linux.sh
-./resources/linux/setup_dev_linux.sh
-```
-
-**2. Start system services:**
-```bash
-# Start MongoDB, Elasticsearch, and RabbitMQ
-chmod +x resources/linux/start_services.sh
-./resources/linux/start_services.sh
-```
-
-**3. Start the APIs (in separate terminals):**
-
-**Terminal 1 - Start GraphQL API:**
+**Terminal 1 - Iniciar API GraphQL:**
 ```bash
 cd api-a-core
 npm run dev
-# API will be available at http://localhost:4000
-# GraphQL endpoint: http://localhost:4000/graphql
-# Health check: http://localhost:4000/health
+# La API estará disponible en http://localhost:4000
+# Endpoint GraphQL: http://localhost:4000/graphql
+# Verificación de estado: http://localhost:4000/health
 ```
 
-**Terminal 2 - Start Search API:**
+**Terminal 2 - Iniciar API de Búsqueda:**
 ```bash
 cd api-b-search
 npm run dev
-# API will be available at http://localhost:3001
-# Search endpoint: http://localhost:3001/search?q=<query>
-# Health check: http://localhost:3001/health
+# La API estará disponible en http://localhost:3001
+# Endpoint de búsqueda: http://localhost:3001/search?q=<consulta>
+# Verificación de estado: http://localhost:3001/health
 ```
 
-**4. Reset GraphQL database (if needed):**
+**3. Ejecutar datos de prueba:**
 ```bash
-# Clear all data from MongoDB and Elasticsearch
-chmod +x resources/linux/reset-graphql.sh
-./resources/linux/reset-graphql.sh
+chmod +x resources/seed.sh
+./resources/seed.sh
 ```
 
-**5. Stop system services (when done):**
-```bash
-# Stop MongoDB, Elasticsearch, and RabbitMQ
-chmod +x resources/linux/stop_services.sh
-./resources/linux/stop_services.sh
-```
+> [!NOTE]
+> Si no prefieres la configuración manual o no estás usando Linux, usa la versión con Docker:
 
-#### Manual Setup (All Platforms)
-
-If you prefer manual setup or are not using Linux:
-
-### Option 2: Docker (if services are dockerized)
+### Opción 2: Docker (Correr los servicios en contenedores Docker)
 
 ```bash
-# Start all services
-docker-compose up -d
+# Iniciar todos los servicios con docker
+docker-compose up --build -d
 
-# Check service status
+# Verificar estado de los servicios
 docker-compose ps
+
+# Ejecutar datos de prueba
+chmod +x resources/seed.sh
+./resources/seed.sh
 ```
 
-## API Documentation
+## Endpoints de la API
 
-### GraphQL API (Port 4000)
+### API GraphQL (Puerto 4000)
 
 **Endpoint:** `http://localhost:4000/graphql`
 
-#### Queries
+#### Consultas
 
 ```graphql
-
-# Get single product by ID
+# Obtener un producto por ID
 query {
-  product(id: "product_id_here") {
+  product(id: "id_del_producto") {
     id
     gs1Id
     name
@@ -195,7 +160,7 @@ query {
 ```
 
 ```graphql
-# Get paginated products list
+# Obtener lista paginada de productos
 query {
   products(page: 1, limit: 10) {
     total
@@ -214,17 +179,17 @@ query {
 }
 ```
 
-#### Mutations
+#### Mutaciones
 
 ```graphql
-# Create product (requires x-role header: PROVIDER or EDITOR)
+# Crear producto (requiere cabecera x-role: PROVIDER o EDITOR)
 mutation {
   createProduct(input: {
     gs1Id: "GS1-001"
-    name: "Product Name"
-    description: "Product description"
-    brand: "Brand Name"
-    manufacturer: "Manufacturer Name"
+    name: "Nombre del Producto"
+    description: "Descripción del producto"
+    brand: "Marca"
+    manufacturer: "Fabricante"
     netWeight: "500g"
   }) {
     id
@@ -236,11 +201,11 @@ mutation {
 ```
 
 ```graphql
-# Update product (requires x-role header: PROVIDER or EDITOR)
+# Actualizar producto (requiere cabecera x-role: PROVIDER o EDITOR)
 mutation {
-  updateProduct(id: "product_id_here", patch: {
-    name: "Updated Name"
-    description: "Updated description"
+  updateProduct(id: "id_del_producto", patch: {
+    name: "Nombre actualizado"
+    description: "Descripción actualizada"
   }) {
     id
     name
@@ -250,9 +215,9 @@ mutation {
 ```
 
 ```graphql
-# Approve product (requires x-role header: EDITOR)
+# Aprobar producto (requiere cabecera x-role: EDITOR)
 mutation {
-  approveProduct(id: "product_id_here") {
+  approveProduct(id: "id_del_producto") {
     id
     status
   }
@@ -260,7 +225,7 @@ mutation {
 ```
 
 ```graphql
-# Clear all products
+# Eliminar todos los productos
 mutation {
   clearProducts {
     success
@@ -268,66 +233,46 @@ mutation {
 }
 ```
 
-**Role Headers:**
-- `x-role: PROVIDER` - Can create products (status: PENDING), update own products
-- `x-role: EDITOR` - Can create products (status: PUBLISHED), update any product, approve products
+**Cabeceras de rol:**
+- `x-role: PROVIDER` - Puede crear productos (estado: PENDING), actualizar productos propios
+- `x-role: EDITOR` - Puede crear productos (estado: PUBLISHED), actualizar cualquier producto, aprobar productos
 
-### Search API (Port 3001)
+### API de Búsqueda (Puerto 3001)
 
-**Endpoint:** `http://localhost:3001/search`
+**Endpoint de búsqueda:** `http://localhost:3001/search?q=<consulta>`
 
-```bash
-# Search products
-GET /search?q=coffee
-GET /search?q=agua
-GET /search?q=cafe  # Works with accent-folding
-```
-
-**Response:**
+**Ejemplo de respuesta:**
 ```json
 {
   "hits": [
     {
-      "id": "product_id",
+      "id": "id_del_producto",
       "score": 2.5,
-      "gs1Id": "GS1-002",
-      "name": "Ground Coffee 250g",
-      "brand": "Cafetal",
-      "description": "Medium roast",
-      "manufacturer": "Beans SRL",
-      "netWeight": "250g",
-      "status": "PUBLISHED",
-      "updatedAt": "2025-08-30T13:02:37.202Z"
+      "name": "Nombre del producto",
+      "brand": "Marca",
+      "description": "Descripción del producto"
     }
-  ]
+  ],
+  "total": 1,
+  "took": 5
 }
 ```
 
-## Testing
+## Pruebas
 
-### 1. Health Checks
-
-Use the provided health check script:
+### 1. Verificación de estado
 
 ```bash
-cd resources
-chmod +x health-check.sh
-./health-check.sh
-```
-
-Or manually check each service:
-
-```bash
-# Check all services are running
-curl http://localhost:4000/health  # GraphQL API
-curl http://localhost:3001/health  # Search API
+# Verificar estado de todos los servicios
+curl http://localhost:4000/health  # API GraphQL
+curl http://localhost:3001/health  # API de Búsqueda
 curl http://localhost:9200/_cluster/health  # Elasticsearch
 sudo rabbitmqctl status  # RabbitMQ
 ```
 
-### 2. Seed Test Data
+### 2. Ejecutar datos de prueba
 
-Run the included seed script to populate the system with test data:
+Ejecuta el script de datos de prueba incluido para poblar el sistema con datos de prueba:
 
 ```bash
 cd resources
@@ -335,34 +280,32 @@ chmod +x seed.sh
 ./seed.sh
 ```
 
-The seed script will:
-- Clear existing data from both MongoDB and Elasticsearch
-- Create test products with different roles (PROVIDER and EDITOR)
-- Test product listing via GraphQL with pagination
-- Test search functionality with accent-folding
-- Verify real-time indexing via RabbitMQ messaging
+El script de datos de prueba hará lo siguiente:
+- Eliminará los datos existentes de MongoDB y Elasticsearch
+- Creará productos de prueba con diferentes roles (PROVIDER y EDITOR)
+- Probará la lista de productos mediante GraphQL con paginación
+- Probará la funcionalidad de búsqueda con acentos
+- Verificará la indexación en tiempo real mediante RabbitMQ
 
-### 3. Run Complete Test Suite
+### 3. Ejecutar la suite de pruebas completa
 
-Execute all tests including integration tests:
+Ejecuta todas las pruebas, incluyendo pruebas de integración:
 
 ```bash
-cd resources
-chmod +x run-tests.sh
-./run-tests.sh
+-
 ```
 
-This comprehensive test script includes:
-- Health checks for all services
-- Database seeding
-- API endpoint testing
-- RabbitMQ message flow verification
-- Elasticsearch indexing validation
-- Search functionality testing
+Esta suite de pruebas completa incluye:
+- Verificación de estado de todos los servicios
+- Ejecución de datos de prueba
+- Pruebas de endpoints de API
+- Verificación de flujo de mensajes de RabbitMQ
+- Verificación de indexación de Elasticsearch
+- Pruebas de funcionalidad de búsqueda
 
-### 3. Manual Testing Examples
+### 3. Ejemplos de pruebas manuales
 
-#### Create a Product (PROVIDER role)
+#### Crear un producto (rol PROVIDER)
 
 ```bash
 curl -X POST http://localhost:4000/graphql \
@@ -373,30 +316,30 @@ curl -X POST http://localhost:4000/graphql \
     "variables": {
       "input": {
         "gs1Id": "GS1-TEST",
-        "name": "Test Product",
-        "brand": "Test Brand",
-        "description": "Test Description",
-        "manufacturer": "Test Manufacturer",
+        "name": "Nombre del producto",
+        "brand": "Marca",
+        "description": "Descripción del producto",
+        "manufacturer": "Fabricante",
         "netWeight": "100g"
       }
     }
   }'
 ```
 
-#### Search for Products
+#### Buscar productos
 
 ```bash
-# Search for coffee products
-curl "http://localhost:3001/search?q=coffee"
+# Buscar productos que contengan "café"
+curl "http://localhost:3001/search?q=café"
 
-# Search with accents
-curl "http://localhost:3001/search?q=coffee"
+# Buscar productos que contengan "agua"
+curl "http://localhost:3001/search?q=agua"
 
-# Search without accents (should still work)
-curl "http://localhost:3001/search?q=coffee"
+# Buscar productos que contengan "cafe" (sin acento)
+curl "http://localhost:3001/search?q=cafe"
 ```
 
-#### Get Products List
+#### Obtener lista de productos
 
 ```bash
 curl -X POST http://localhost:4000/graphql \
@@ -406,90 +349,90 @@ curl -X POST http://localhost:4000/graphql \
   }'
 ```
 
-### 4. RabbitMQ Integration Testing
+### 4. Pruebas de integración de RabbitMQ
 
-Verify that RabbitMQ is properly routing messages:
+Verifica que RabbitMQ esté enrutando mensajes correctamente:
 
 ```bash
-# Check RabbitMQ queues and messages
+# Verificar colas y mensajes de RabbitMQ
 sudo rabbitmqctl list_queues name messages consumers
 
-# Check RabbitMQ exchanges
+# Verificar intercambios de RabbitMQ
 sudo rabbitmqctl list_exchanges
 
-# Check bindings
+# Verificar enlaces
 sudo rabbitmqctl list_bindings
 ```
 
-### 5. Elasticsearch Testing
+### 5. Pruebas de Elasticsearch
 
 ```bash
-# Check indexed products
+# Verificar productos indexados
 curl "http://localhost:9200/products/_search?pretty"
 
-# Check index mapping
+# Verificar mapeo de índice
 curl "http://localhost:9200/products/_mapping?pretty"
 
-# Test search directly in Elasticsearch
+# Probar búsqueda directamente en Elasticsearch
 curl -X POST "http://localhost:9200/products/_search?pretty" \
   -H 'Content-Type: application/json' \
   --data '{
     "query": {
       "multi_match": {
-        "query": "coffee",
+        "query": "café",
         "fields": ["name^3", "brand^2", "description"]
       }
     }
   }'
 ```
 
-## Troubleshooting
+## Solución de Problemas
 
-### Common Issues
+### Problemas comunes
 
-1. **Services not starting:**
-   - Check if ports 4000, 3001, 9200, 5672, 27017 are available
-   - Verify environment files are correctly configured
-   - Check service logs for error messages
+1. **Servicios no se inician:**
+   - Verifica si los puertos 4000, 3001, 9200, 5672, 27017 están disponibles
+   - Verifica si los archivos de entorno están configurados correctamente
+   - Verifica los registros de cada servicio para mensajes de error
 
-2. **Search not working:**
-   - Verify Elasticsearch is running and accessible
-   - Check if RabbitMQ consumer is processing messages
-   - Ensure products are being indexed after creation
+2. **Búsqueda no funciona:**
+   - Verifica si Elasticsearch está en ejecución y es accesible
+   - Verifica si el consumidor de RabbitMQ está procesando mensajes
+   - Asegúrate de que los productos se estén indexando después de la creación
 
-3. **RabbitMQ issues:**
-   - Check if RabbitMQ is running: `sudo systemctl status rabbitmq-server`
-   - Verify queue bindings: `sudo rabbitmqctl list_bindings`
-   - Check for failed messages: `sudo rabbitmqctl list_queues name messages`
+3. **Problemas de RabbitMQ:**
+   - Verifica si RabbitMQ está en ejecución: `sudo systemctl status rabbitmq-server`
+   - Verifica si las colas están enlazadas: `sudo rabbitmqctl list_bindings`
+   - Verifica si hay mensajes fallidos: `sudo rabbitmqctl list_queues name messages`
 
-4. **GraphQL errors:**
-   - Verify MongoDB connection
-   - Check if required headers (x-role) are provided
-   - Validate input data format
+4. **Errores de GraphQL:**
+   - Verifica la conexión a MongoDB
+   - Verifica si se proporcionan las cabeceras requeridas (x-role)
+   - Verifica el formato de los datos de entrada
 
-### Logs
+### Registros
 
 ```bash
-# View API logs
-cd api-a-core && npm run dev  # Check console output
-cd api-b-search && npm run dev  # Check console output
+# Verificar registros de API
+cd api-a-core && npm run dev  # Verificar salida de la consola
+cd api-b-search && npm run dev  # Verificar salida de la consola
 
-# System service logs
+# Registros de servicios del sistema
 sudo journalctl -u mongod -f
 sudo journalctl -u elasticsearch -f
 sudo journalctl -u rabbitmq-server -f
 ```
 
-## Performance Notes
+## Notas de Rendimiento
 
-- The system uses real-time indexing via RabbitMQ for immediate search availability
-- Elasticsearch is configured with accent-folding for international product names
-- GraphQL API includes pagination for efficient large dataset handling
-- Search API uses relevance scoring with field boosting (name > brand > description)
+- El sistema utiliza indexación en tiempo real mediante RabbitMQ para disponibilidad de búsqueda inmediata
+- Elasticsearch está configurado con acentos para nombres de productos internacionales
+- La API GraphQL incluye paginación para manejo eficiente de grandes conjuntos de datos
+- La API de búsqueda utiliza puntuación de relevancia con impulso de campo (nombre > marca > descripción)
 
-## Development
+## Desarrollo
 
-- Both APIs support hot reloading in development mode
-- Use GraphQL Playground at `http://localhost:4000/graphql` for interactive API testing
-- Elasticsearch index can be reset/recreated by restarting the search service
-- RabbitMQ messages are persistent and will be reprocessed if consumers restart
+- Ambas APIs admiten recarga en caliente en modo de desarrollo
+- Utiliza GraphQL Playground en `http://localhost:4000/graphql` para pruebas interactivas de API
+- El índice de Elasticsearch se puede reiniciar/recrear reiniciando el servicio de búsqueda
+- Los mensajes de RabbitMQ son persistentes y se reprocesarán si los consumidores se reinician

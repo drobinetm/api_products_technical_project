@@ -1,20 +1,77 @@
 import { GraphQLJSON } from 'graphql-type-json';
-import { createProduct, updateProduct, approveProduct, getProductWithHistory, getAllProducts, clearProducts } from '../services/productService.js';
-import AuditLog from '../models/AuditLog.js';
+import productService from '../services/productService.js';
 
+/**
+ * GraphQL resolvers for the Product type and related operations
+ */
 export default {
     JSON: GraphQLJSON,
+    
     Query: {
-        product: async (_r, { id }) => getProductWithHistory(id),
-        products: async (_r, { page, limit }) => getAllProducts(page, limit),
+        /**
+         * Get a single product by ID with its history
+         */
+        product: async (_, { id }) => {
+            return productService.getProductWithHistory(id);
+        },
+        
+        /**
+         * Get paginated list of products
+         */
+        products: async (_, { page, limit }) => {
+            return productService.getAllProducts(page, limit);
+        },
     },
+    
     Mutation: {
-        createProduct: async (_r, { input }, { user }) => createProduct(input, user),
-        updateProduct: async (_r, { id, patch }, { user }) => updateProduct(id, patch, user),
-        approveProduct: async (_r, { id }, { user }) => approveProduct(id, user),
-        clearProducts: async () => clearProducts(),
+        /**
+         * Create a new product
+         */
+        createProduct: async (_, { input }, { user }) => {
+            if (!user) {
+                throw new Error('Authentication required');
+            }
+            return productService.createProduct(input, user);
+        },
+        
+        /**
+         * Update an existing product
+         */
+        updateProduct: async (_, { id, patch }, { user }) => {
+            if (!user) {
+                throw new Error('Authentication required');
+            }
+            return productService.updateProduct(id, patch, user);
+        },
+        
+        /**
+         * Approve a pending product
+         */
+        approveProduct: async (_, { id }, { user }) => {
+            if (!user) {
+                throw new Error('Authentication required');
+            }
+            return productService.approveProduct(id, user);
+        },
+        
+        /**
+         * Clear all products (admin only)
+         */
+        clearProducts: async () => {
+            // Note: Authentication check is handled in the service layer
+            return productService.clearProducts();
+        },
     },
+    
     Product: {
-        history: async (p) => AuditLog.find({ productId: p._id || p.id }).sort({ createdAt: -1 }),
+        /**
+         * Get the history/audit log for a product
+         * This is now handled by the getProductWithHistory service method
+         */
+        history: (product) => {
+            // The history is already included in the product object
+            // when using getProductWithHistory
+            return product.history || [];
+        },
     },
 };
