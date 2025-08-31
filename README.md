@@ -1,4 +1,33 @@
-# Prueba Técnica de API de Productos
+<div align="center">
+   <a href="https://github.com/drobinetm/api_products_technical_project/">
+    <img src="https://tse3.mm.bing.net/th/id/OIP.UzENLb6dzuZRsMhfFMeNpAHaHa?r=0&w=474&h=474&c=7&p=0" alt="API Products" style="width:96px; height:72px; vertical-align:middle; border-radius: 10px;">
+    <h1>Prueba Técnica de API de Productos</h1>
+   </a>
+   <a href="https://www.rabbitmq.com/">
+     <img src="https://img.shields.io/badge/RabbitMQ-FF6600?logo=rabbitmq&logoColor=white" alt="RabbitMQ">
+   </a>   
+   <a href="https://www.elastic.co/elasticsearch/">
+     <img src="https://img.shields.io/badge/Elasticsearch-8.14.3-005571?logo=elasticsearch&logoColor=white" alt="Elasticsearch 8.14.3">
+   </a>   
+   <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript">
+     <img src="https://img.shields.io/badge/JavaScript-ES2023-F7DF1E?logo=javascript&logoColor=black" alt="JavaScript">
+   </a>   
+   <a href="https://www.npmjs.com/package/express">
+     <img src="https://img.shields.io/badge/Express-%5E4.19.2-000000?logo=express&logoColor=white" alt="Express ^4.19.2">
+   </a>   
+   <a href="https://www.npmjs.com/package/graphql">
+     <img src="https://img.shields.io/badge/GraphQL-%5E16.9.0-E10098?logo=graphql&logoColor=white" alt="GraphQL ^16.9.0">
+   </a>   
+   <a href="https://www.mongodb.com/">
+     <img src="https://img.shields.io/badge/MongoDB-7-47A248?logo=mongodb&logoColor=white" alt="MongoDB 7">
+   </a>   
+   <a href="https://www.elastic.co/kibana/">
+     <img src="https://img.shields.io/badge/Kibana-8.14.3-005571?logo=kibana&logoColor=white" alt="Kibana 8.14.3">
+   </a>
+   <a href="https://raw.githubusercontent.com/drobinetm/api_products_technical_project/main/LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT license">
+   </a>
+</div>
 
 Un sistema de gestión de productos basado en microservicios con API GraphQL, indexación en tiempo real mediante RabbitMQ y capacidades de búsqueda con Elasticsearch.
 
@@ -54,6 +83,13 @@ docker-compose ps
 chmod +x resources/seed.sh
 ./resources/seed.sh
 ```
+- Al levantar los servicios con docker, podrás acceder a los siguientes endpoints:
+  - http://localhost:4000/graphql   => API GraphQL
+  - http://localhost:3001/search?q= => API Rest
+  - http://localhost:9200/           => Elasticsearch
+  - http://localhost:5601/           => Kibana (Al correr el `seed.sh` podrás crear tu dashboard y ver los datos)
+  - http://localhost:15672/           => RabbitMQ (Administración de RabbitMQ)
+  - http://localhost:27017/          => MongoDB
 
 ### Opción 2: Local
 
@@ -124,6 +160,14 @@ npm run dev
 chmod +x resources/seed.sh
 ./resources/seed.sh
 ```
+
+- Al levantar los servicios, podrás acceder a los siguientes endpoints:
+   - http://localhost:4000/graphql   => API GraphQL
+   - http://localhost:3001/search?q= => API Rest
+   - http://localhost:9200/           => Elasticsearch
+   - http://localhost:15672/           => Kibana (Al correr el `seed.sh` podrás crear tu dashboard y ver los datos)
+   - http://localhost:5672/           => RabbitMQ (Administración de RabbitMQ)
+   - http://localhost:27017/          => MongoDB
 
 > [!NOTE]
 > Si no prefieres la configuración manual o no estás usando Linux, usa la versión con Docker
@@ -277,9 +321,8 @@ sudo rabbitmqctl status  # RabbitMQ
 Ejecuta el script de datos de prueba incluido para poblar el sistema con datos de prueba:
 
 ```bash
-cd resources
-chmod +x seed.sh
-./seed.sh
+chmod +x  resources/seed.sh
+./resources/seed.sh
 ```
 
 El script de datos de prueba hará lo siguiente:
