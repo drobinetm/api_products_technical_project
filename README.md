@@ -68,6 +68,58 @@ Asegúrate de tener instalado:
 └── docker-compose.yml   # Servicios Docker (opcional)
 ```
 
+## Desarrollo
+
+- Ambas APIs admiten recarga en caliente en modo de desarrollo
+- Utiliza GraphQL Playground en `http://localhost:4000/graphql` para pruebas interactivas de API
+- Los mensajes de RabbitMQ son persistentes y se reprocesarán si los consumidores se reinician
+
+## Validación de Código
+
+El proyecto incluye un script de validación que ejecuta las siguientes tareas para ambos proyectos (api-a-core y api-b-search):
+
+```bash
+# Hacer ejecutable el script (solo primera vez)
+chmod +x resources/validate_projects.sh
+
+# Ejecutar validación
+./resources/validate_projects.sh
+```
+
+### Comandos que ejecuta el script:
+
+1. **Instalación de dependencias**
+   ```bash
+   npm install
+   ```
+
+2. **Análisis de código estático**
+   ```bash
+   npm run lint
+   ```
+
+3. **Corrección automática de problemas de formato**
+   ```bash
+   npm run lint:fix
+   ```
+
+4. **Formateo de código**
+   ```bash
+   npm run format
+   ```
+
+5. **Ejecución de pruebas**
+   ```bash
+   npm test
+   ```
+
+6. **Validación completa**
+   ```bash
+   npm run validate
+   ```
+
+El script muestra el progreso con colores para mejor legibilidad y se detiene si encuentra algún error crítico durante la ejecución.
+
 ## Ejecutando la Aplicación
 
 ### Opción 1: Docker (Correr los servicios en contenedores Docker)
@@ -474,10 +526,3 @@ sudo journalctl -u rabbitmq-server -f
 - Elasticsearch está configurado con acentos para nombres de productos internacionales
 - La API GraphQL incluye paginación para manejo eficiente de grandes conjuntos de datos
 - La API de búsqueda utiliza puntuación de relevancia con impulso de campo (nombre > marca > descripción)
-
-## Desarrollo
-
-- Ambas APIs admiten recarga en caliente en modo de desarrollo
-- Utiliza GraphQL Playground en `http://localhost:4000/graphql` para pruebas interactivas de API
-- El índice de Elasticsearch se puede reiniciar/recrear reiniciando el servicio de búsqueda
-- Los mensajes de RabbitMQ son persistentes y se reprocesarán si los consumidores se reinician

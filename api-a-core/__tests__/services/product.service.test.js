@@ -34,7 +34,7 @@ jest.mock('shared/events.js', () => ({
     PRODUCT_APPROVED: 'product.approved',
     PRODUCTS_CLEARED: 'product.cleared',
   },
-  productEventPayload: jest.fn((data) => ({ wrapped: data })),
+  productEventPayload: jest.fn(data => ({ wrapped: data })),
 }));
 
 // Importa los mocks para poder configurarlos en cada test
@@ -43,7 +43,6 @@ import { logChange } from '@/services/audit.service.js';
 import { publishEvent } from '@/bus/publisher.event.js';
 import { EVENT_TYPES, productEventPayload } from 'shared/events.js';
 import ProductService from '@/services/product.service.js';
-
 
 describe('ProductService', () => {
   let consoleErrorSpy;
@@ -73,34 +72,34 @@ describe('ProductService', () => {
         ...input,
         status: 'PUBLISHED',
         createdByRole: 'EDITOR',
-        toObject: () => ({ _id: '123', ...input, status: 'PUBLISHED' })
+        toObject: () => ({ _id: '123', ...input, status: 'PUBLISHED' }),
       };
-      
-      jest.spyOn(Product, 'create').mockImplementation(async (data) => {
+
+      jest.spyOn(Product, 'create').mockImplementation(async data => {
         return Promise.resolve(mockProduct);
       });
-      
+
       // Act
       const result = await ProductService.createProduct(input, user);
-      
+
       // Assert
       expect(Product.create).toHaveBeenCalledWith({
         ...input,
         status: 'PUBLISHED',
-        createdByRole: 'EDITOR'
+        createdByRole: 'EDITOR',
       });
       expect(result).toEqual(mockProduct);
     });
   });
-  
+
   describe('getAllProducts', () => {
     it('should return paginated products', async () => {
       // Arrange
       const mockProducts = [
         { _id: '1', name: 'Product 1' },
-        { _id: '2', name: 'Product 2' }
+        { _id: '2', name: 'Product 2' },
       ];
-      
+
       jest.spyOn(Product, 'countDocuments').mockImplementation(async () => {
         return Promise.resolve(2);
       });
@@ -108,12 +107,12 @@ describe('ProductService', () => {
         sort: jest.fn().mockReturnThis(),
         skip: jest.fn().mockReturnThis(),
         limit: jest.fn().mockReturnThis(),
-        lean: jest.fn().mockResolvedValue(mockProducts)
+        lean: jest.fn().mockResolvedValue(mockProducts),
       }));
-      
+
       // Act
       const result = await ProductService.getAllProducts(1, 10);
-      
+
       // Assert
       expect(result.total).toBe(2);
       expect(result.page).toBe(1);

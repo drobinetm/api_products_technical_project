@@ -9,7 +9,7 @@ const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 10;
 const STATUS = {
   PENDING: 'PENDING',
-  PUBLISHED: 'PUBLISHED'
+  PUBLISHED: 'PUBLISHED',
 };
 
 // Error messages
@@ -31,7 +31,7 @@ class ProductService {
     this.bus = {
       url: process.env.RABBITMQ_URL,
       exchange: process.env.RABBITMQ_EXCHANGE,
-      ...dependencies.bus
+      ...dependencies.bus,
     };
   }
 
@@ -54,7 +54,7 @@ class ProductService {
       };
 
       const created = await Product.create(productData);
-      
+
       await this._logProductChange({
         productId: created._id,
         action: 'CREATE',
@@ -64,7 +64,7 @@ class ProductService {
       });
 
       await this._publishEvent(EVENT_TYPES.PRODUCT_CREATED, created);
-      
+
       return created;
     } catch (error) {
       this._handleError(error);
@@ -90,7 +90,7 @@ class ProductService {
       }
 
       const updated = await Product.findByIdAndUpdate(id, patch, { new: true });
-      
+
       await this._logProductChange({
         productId: id,
         action: 'UPDATE',
@@ -100,7 +100,7 @@ class ProductService {
       });
 
       await this._publishEvent(EVENT_TYPES.PRODUCT_UPDATED, updated);
-      
+
       return updated;
     } catch (error) {
       this._handleError(error);
@@ -129,11 +129,11 @@ class ProductService {
       }
 
       const updated = await Product.findByIdAndUpdate(
-        id, 
-        { status: STATUS.PUBLISHED }, 
+        id,
+        { status: STATUS.PUBLISHED },
         { new: true }
       );
-      
+
       await this._logProductChange({
         productId: id,
         action: 'APPROVE',
@@ -143,7 +143,7 @@ class ProductService {
       });
 
       await this._publishEvent(EVENT_TYPES.PRODUCT_APPROVED, updated);
-      
+
       return updated;
     } catch (error) {
       this._handleError(error);
@@ -161,15 +161,11 @@ class ProductService {
       const skip = (page - 1) * limit;
       const [total, items] = await Promise.all([
         Product.countDocuments(),
-        Product.find()
-          .sort({ createdAt: -1 })
-          .skip(skip)
-          .limit(limit)
-          .lean()
+        Product.find().sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
       ]);
-      
+
       const pages = Math.ceil(total / limit);
-      
+
       return {
         total,
         page,
@@ -197,7 +193,7 @@ class ProductService {
     try {
       const [product, history] = await Promise.all([
         Product.findById(id).lean(),
-        this._getAuditLogs(id)
+        this._getAuditLogs(id),
       ]);
 
       if (!product) {
@@ -216,13 +212,10 @@ class ProductService {
    */
   async clearProducts() {
     try {
-      const [_, __] = await Promise.all([
-        Product.deleteMany({}),
-        this._clearAuditLogs()
-      ]);
+      const [_, __] = await Promise.all([Product.deleteMany({}), this._clearAuditLogs()]);
 
       await this._publishEvent(EVENT_TYPES.PRODUCTS_CLEARED, { action: 'clear_all' });
-      
+
       return { success: true };
     } catch (error) {
       this._handleError(error);

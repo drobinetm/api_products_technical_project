@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 moduleAlias.addAliases({
   '@': path.join(__dirname, '.'),
-  'shared': '/shared'
+  shared: '/shared',
 });
 
 import express from 'express';
@@ -29,10 +29,13 @@ async function main() {
   app.use(express.json());
   app.use(auth);
 
-  app.use('/graphql', createHandler({
-    schema,
-    context: ({ raw, req }) => ({ user: (req || raw).user }),
-  }));
+  app.use(
+    '/graphql',
+    createHandler({
+      schema,
+      context: ({ raw, req }) => ({ user: (req || raw).user }),
+    })
+  );
 
   app.get('/health', (_req, res) => res.json({ ok: true }));
 
@@ -40,4 +43,7 @@ async function main() {
   app.listen(port, () => console.log(`API A running on :${port}`));
 }
 
-main().catch((e) => { console.error(e); process.exit(1); });
+main().catch(e => {
+  console.error(e);
+  process.exit(1);
+});

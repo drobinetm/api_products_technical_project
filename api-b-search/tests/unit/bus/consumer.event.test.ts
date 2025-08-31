@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
-import { 
-  createMockProduct, 
+import {
+  createMockProduct,
   createMockRabbitMQMessage,
   createMockRabbitMQConnection,
-  createMockRabbitMQChannel
+  createMockRabbitMQChannel,
 } from '../../support/test-utils.js';
 
 // Mock amqplib
@@ -34,7 +34,7 @@ describe('RabbitMQ Consumer', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    
+
     // Reset environment
     process.env = { ...originalEnv };
     process.env.RABBITMQ_URL = 'amqp://localhost:5672';
@@ -43,7 +43,7 @@ describe('RabbitMQ Consumer', () => {
 
     // Setup mocks
     mockConnection.createChannel.mockResolvedValue(mockChannel);
-    
+
     const { default: amqpDefault } = await import('amqplib');
     amqp = amqpDefault;
     (amqp.connect as Mock).mockResolvedValue(mockConnection);
@@ -62,15 +62,23 @@ describe('RabbitMQ Consumer', () => {
   describe('startConsumer function', () => {
     it('should establish connection and setup consumer correctly', async () => {
       const { startConsumer } = await import('@/bus/consumer.event.js');
-      
+
       await startConsumer();
 
       expect(amqp.connect).toHaveBeenCalledWith('amqp://localhost:5672');
       expect(mockConnection.createChannel).toHaveBeenCalled();
-      expect(mockChannel.assertExchange).toHaveBeenCalledWith('test-exchange', 'topic', { durable: true });
+      expect(mockChannel.assertExchange).toHaveBeenCalledWith('test-exchange', 'topic', {
+        durable: true,
+      });
       expect(mockChannel.assertQueue).toHaveBeenCalledWith('test-queue', { durable: true });
-      expect(mockChannel.bindQueue).toHaveBeenCalledWith('test-queue', 'test-exchange', 'product.*');
-      expect(mockChannel.consume).toHaveBeenCalledWith('test-queue', expect.any(Function), { noAck: false });
+      expect(mockChannel.bindQueue).toHaveBeenCalledWith(
+        'test-queue',
+        'test-exchange',
+        'product.*'
+      );
+      expect(mockChannel.consume).toHaveBeenCalledWith('test-queue', expect.any(Function), {
+        noAck: false,
+      });
       expect(consoleLogSpy).toHaveBeenCalledWith('Search consumer started');
     });
 
@@ -79,7 +87,7 @@ describe('RabbitMQ Consumer', () => {
       (amqp.connect as Mock).mockRejectedValue(connectionError);
 
       const { startConsumer } = await import('@/bus/consumer.event.js');
-      
+
       await expect(startConsumer()).rejects.toThrow('Connection failed');
     });
 
@@ -88,7 +96,7 @@ describe('RabbitMQ Consumer', () => {
       mockConnection.createChannel.mockRejectedValue(channelError);
 
       const { startConsumer } = await import('@/bus/consumer.event.js');
-      
+
       await expect(startConsumer()).rejects.toThrow('Channel creation failed');
     });
 
@@ -97,7 +105,7 @@ describe('RabbitMQ Consumer', () => {
       mockChannel.assertExchange.mockRejectedValue(exchangeError);
 
       const { startConsumer } = await import('@/bus/consumer.event.js');
-      
+
       await expect(startConsumer()).rejects.toThrow('Exchange assertion failed');
     });
   });
@@ -118,9 +126,9 @@ describe('RabbitMQ Consumer', () => {
     it('should process regular product messages and call upsert', async () => {
       const mockProduct = createMockProduct({
         id: 'test-product-123',
-        name: 'Test Product for Upsert'
+        name: 'Test Product for Upsert',
       });
-      
+
       const message = createMockRabbitMQMessage(mockProduct, 'product.created');
       mockUpsert.mockResolvedValue(undefined);
 
@@ -134,9 +142,9 @@ describe('RabbitMQ Consumer', () => {
     it('should process product.updated messages', async () => {
       const mockProduct = createMockProduct({
         id: 'updated-product-123',
-        name: 'Updated Product Name'
+        name: 'Updated Product Name',
       });
-      
+
       const message = createMockRabbitMQMessage(mockProduct, 'product.updated');
       mockUpsert.mockResolvedValue(undefined);
 
@@ -149,9 +157,9 @@ describe('RabbitMQ Consumer', () => {
     it('should process product.approved messages', async () => {
       const mockProduct = createMockProduct({
         id: 'approved-product-123',
-        status: 'PUBLISHED'
+        status: 'PUBLISHED',
       });
-      
+
       const message = createMockRabbitMQMessage(mockProduct, 'product.approved');
       mockUpsert.mockResolvedValue(undefined);
 
@@ -177,7 +185,7 @@ describe('RabbitMQ Consumer', () => {
       const malformedMessage = {
         content: Buffer.from('invalid json {'),
         fields: { routingKey: 'product.created' },
-        properties: {}
+        properties: {},
       };
 
       await messageHandler(malformedMessage);
@@ -190,7 +198,7 @@ describe('RabbitMQ Consumer', () => {
     it('should handle upsert errors and nack message', async () => {
       const mockProduct = createMockProduct();
       const message = createMockRabbitMQMessage(mockProduct, 'product.created');
-      
+
       const upsertError = new Error('Upsert failed');
       mockUpsert.mockRejectedValue(upsertError);
 
@@ -204,7 +212,7 @@ describe('RabbitMQ Consumer', () => {
 
     it('should handle clearIndex errors and nack message', async () => {
       const clearMessage = createMockRabbitMQMessage({ action: 'clear_all' }, 'product.cleared');
-      
+
       const clearError = new Error('Clear index failed');
       mockClearIndex.mockRejectedValue(clearError);
 
@@ -230,7 +238,7 @@ describe('RabbitMQ Consumer', () => {
       const emptyMessage = {
         content: Buffer.from(''),
         fields: { routingKey: 'product.created' },
-        properties: {}
+        properties: {},
       };
 
       await messageHandler(emptyMessage);
@@ -256,7 +264,7 @@ describe('RabbitMQ Consumer', () => {
       const messageWithoutRoutingKey = {
         content: Buffer.from(JSON.stringify(mockProduct)),
         fields: {}, // No routing key
-        properties: {}
+        properties: {},
       };
       mockUpsert.mockResolvedValue(undefined);
 
@@ -295,7 +303,7 @@ describe('RabbitMQ Consumer', () => {
     it('should not acknowledge failed message processing', async () => {
       const mockProduct = createMockProduct();
       const message = createMockRabbitMQMessage(mockProduct, 'product.created');
-      
+
       const processingError = new Error('Processing failed');
       mockUpsert.mockRejectedValue(processingError);
 
@@ -308,7 +316,7 @@ describe('RabbitMQ Consumer', () => {
     it('should use correct nack parameters (no requeue)', async () => {
       const mockProduct = createMockProduct();
       const message = createMockRabbitMQMessage(mockProduct, 'product.created');
-      
+
       mockUpsert.mockRejectedValue(new Error('Test error'));
 
       await messageHandler(message);
@@ -328,9 +336,15 @@ describe('RabbitMQ Consumer', () => {
       await startConsumer();
 
       expect(amqp.connect).toHaveBeenCalledWith('amqp://custom-host:5672');
-      expect(mockChannel.assertExchange).toHaveBeenCalledWith('custom-exchange', 'topic', { durable: true });
+      expect(mockChannel.assertExchange).toHaveBeenCalledWith('custom-exchange', 'topic', {
+        durable: true,
+      });
       expect(mockChannel.assertQueue).toHaveBeenCalledWith('custom-queue', { durable: true });
-      expect(mockChannel.bindQueue).toHaveBeenCalledWith('custom-queue', 'custom-exchange', 'product.*');
+      expect(mockChannel.bindQueue).toHaveBeenCalledWith(
+        'custom-queue',
+        'custom-exchange',
+        'product.*'
+      );
     });
   });
 });

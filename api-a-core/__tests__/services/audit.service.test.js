@@ -47,7 +47,7 @@ describe('Audit Service', () => {
       };
 
       // Use jest.spyOn and mockImplementation
-      jest.spyOn(AuditLog, 'create').mockImplementation(async (data) => {
+      jest.spyOn(AuditLog, 'create').mockImplementation(async data => {
         return Promise.resolve(createdLog);
       });
 

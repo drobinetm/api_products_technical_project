@@ -12,12 +12,12 @@ const originalEnv = process.env;
 
 describe('Elasticsearch Client Service', () => {
   let mockClient: ReturnType<typeof createMockElasticsearchClient>;
-  
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockClient = createMockElasticsearchClient();
     (Client as Mock).mockImplementation(() => mockClient);
-    
+
     // Reset environment variables
     process.env = { ...originalEnv };
     process.env.ELASTIC_URL = 'http://localhost:9200';
@@ -30,12 +30,12 @@ describe('Elasticsearch Client Service', () => {
   describe('Client initialization', () => {
     it('should initialize Elasticsearch client with correct URL', async () => {
       process.env.ELASTIC_URL = 'http://test.elasticsearch.com:9200';
-      
+
       // Import the module after setting up mocks and env vars
       const { es } = await import('@/es/client.service.js');
-      
-      expect(Client).toHaveBeenCalledWith({ 
-        node: 'http://test.elasticsearch.com:9200' 
+
+      expect(Client).toHaveBeenCalledWith({
+        node: 'http://test.elasticsearch.com:9200',
       });
       expect(es).toBeDefined();
     });
@@ -44,7 +44,7 @@ describe('Elasticsearch Client Service', () => {
       // Clear modules first, then set environment
       vi.resetModules();
       delete process.env.ELASTIC_URL;
-      
+
       await expect(async () => {
         await import('@/es/client.service.js');
       }).rejects.toThrow('ELASTIC_URL environment variable is not defined');
@@ -54,7 +54,7 @@ describe('Elasticsearch Client Service', () => {
       // Ensure environment is properly set for this test
       process.env.ELASTIC_URL = 'http://localhost:9200';
       vi.resetModules();
-      
+
       const { INDEX } = await import('@/es/client.service.js');
       expect(INDEX).toBe('products');
     });
@@ -71,7 +71,7 @@ describe('Elasticsearch Client Service', () => {
       mockClient.indices.create.mockResolvedValue({});
 
       const { ensureIndex } = await import('@/es/client.service.js');
-      
+
       await ensureIndex();
 
       expect(mockClient.indices.exists).toHaveBeenCalledWith({ index: 'products' });
@@ -84,10 +84,10 @@ describe('Elasticsearch Client Service', () => {
               folding_analyzer: {
                 type: 'custom',
                 tokenizer: 'standard',
-                filter: ['lowercase', 'asciifolding']
-              }
-            }
-          }
+                filter: ['lowercase', 'asciifolding'],
+              },
+            },
+          },
         },
         mappings: {
           properties: {
@@ -96,24 +96,24 @@ describe('Elasticsearch Client Service', () => {
             name: {
               type: 'text',
               analyzer: 'folding_analyzer',
-              search_analyzer: 'folding_analyzer'
+              search_analyzer: 'folding_analyzer',
             },
             brand: {
               type: 'text',
               analyzer: 'folding_analyzer',
-              search_analyzer: 'folding_analyzer'
+              search_analyzer: 'folding_analyzer',
             },
             description: {
               type: 'text',
               analyzer: 'folding_analyzer',
-              search_analyzer: 'folding_analyzer'
+              search_analyzer: 'folding_analyzer',
             },
             manufacturer: { type: 'text' },
             netWeight: { type: 'keyword' },
             status: { type: 'keyword' },
-            updatedAt: { type: 'date' }
-          }
-        }
+            updatedAt: { type: 'date' },
+          },
+        },
       });
     });
 
@@ -121,7 +121,7 @@ describe('Elasticsearch Client Service', () => {
       mockClient.indices.exists.mockResolvedValue(true);
 
       const { ensureIndex } = await import('@/es/client.service.js');
-      
+
       await ensureIndex();
 
       expect(mockClient.indices.exists).toHaveBeenCalledWith({ index: 'products' });
@@ -133,7 +133,7 @@ describe('Elasticsearch Client Service', () => {
       mockClient.indices.exists.mockRejectedValue(error);
 
       const { ensureIndex } = await import('@/es/client.service.js');
-      
+
       await expect(ensureIndex()).rejects.toThrow('Connection failed');
       expect(mockClient.indices.create).not.toHaveBeenCalled();
     });
@@ -144,7 +144,7 @@ describe('Elasticsearch Client Service', () => {
       mockClient.indices.create.mockRejectedValue(error);
 
       const { ensureIndex } = await import('@/es/client.service.js');
-      
+
       await expect(ensureIndex()).rejects.toThrow('Index creation failed');
     });
 
@@ -153,14 +153,14 @@ describe('Elasticsearch Client Service', () => {
       mockClient.indices.create.mockResolvedValue({});
 
       const { ensureIndex } = await import('@/es/client.service.js');
-      
+
       await ensureIndex();
 
       const createCall = mockClient.indices.create.mock.calls[0][0];
       expect(createCall.settings.analysis.analyzer.folding_analyzer).toEqual({
         type: 'custom',
         tokenizer: 'standard',
-        filter: ['lowercase', 'asciifolding']
+        filter: ['lowercase', 'asciifolding'],
       });
     });
 
@@ -169,23 +169,23 @@ describe('Elasticsearch Client Service', () => {
       mockClient.indices.create.mockResolvedValue({});
 
       const { ensureIndex } = await import('@/es/client.service.js');
-      
+
       await ensureIndex();
 
       const createCall = mockClient.indices.create.mock.calls[0][0];
       const mappings = createCall.mappings.properties;
-      
+
       expect(mappings.id).toEqual({ type: 'keyword' });
       expect(mappings.gs1Id).toEqual({ type: 'keyword' });
       expect(mappings.name).toEqual({
         type: 'text',
         analyzer: 'folding_analyzer',
-        search_analyzer: 'folding_analyzer'
+        search_analyzer: 'folding_analyzer',
       });
       expect(mappings.brand).toEqual({
         type: 'text',
         analyzer: 'folding_analyzer',
-        search_analyzer: 'folding_analyzer'
+        search_analyzer: 'folding_analyzer',
       });
       expect(mappings.status).toEqual({ type: 'keyword' });
       expect(mappings.updatedAt).toEqual({ type: 'date' });
@@ -202,7 +202,7 @@ describe('Elasticsearch Client Service', () => {
       mockClient.indices.exists.mockRejectedValue(networkError);
 
       const { ensureIndex } = await import('@/es/client.service.js');
-      
+
       await expect(ensureIndex()).rejects.toThrow('Network timeout');
     });
 
@@ -212,7 +212,7 @@ describe('Elasticsearch Client Service', () => {
       mockClient.indices.exists.mockRejectedValue(serviceError);
 
       const { ensureIndex } = await import('@/es/client.service.js');
-      
+
       await expect(ensureIndex()).rejects.toThrow('Service unavailable');
     });
   });

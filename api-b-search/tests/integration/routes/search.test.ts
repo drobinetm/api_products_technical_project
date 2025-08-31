@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import express from 'express';
 import request from 'supertest';
-import { 
-  createMockProduct, 
+import {
+  createMockProduct,
   createMockElasticsearchResponse,
-  createMockElasticsearchClient 
+  createMockElasticsearchClient,
 } from '../../support/test-utils.js';
 
 // Mock the Elasticsearch client service
@@ -19,11 +19,11 @@ describe('Search Routes Integration Tests', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    
+
     // Create Express app
     app = express();
     app.use(express.json());
-    
+
     // Import and use search routes
     const { default: searchRoutes } = await import('@/routes/search.js');
     app.use('/', searchRoutes);
@@ -40,23 +40,20 @@ describe('Search Routes Integration Tests', () => {
           id: '1',
           name: 'iPhone 15 Pro',
           brand: 'Apple',
-          description: 'Latest iPhone model'
+          description: 'Latest iPhone model',
         }),
         createMockProduct({
           id: '2',
           name: 'iPhone 15',
           brand: 'Apple',
-          description: 'Standard iPhone model'
-        })
+          description: 'Standard iPhone model',
+        }),
       ];
 
       const mockResponse = createMockElasticsearchResponse(mockProducts);
       mockClient.search.mockResolvedValue(mockResponse);
 
-      const response = await request(app)
-        .get('/search')
-        .query({ q: 'iPhone' })
-        .expect(200);
+      const response = await request(app).get('/search').query({ q: 'iPhone' }).expect(200);
 
       expect(response.body.hits).toHaveLength(2);
       expect(response.body.hits[0]).toEqual({
@@ -69,7 +66,7 @@ describe('Search Routes Integration Tests', () => {
         manufacturer: 'Test Manufacturer',
         netWeight: '100g',
         status: 'PUBLISHED',
-        updatedAt: expect.any(String)
+        updatedAt: expect.any(String),
       });
 
       expect(mockClient.search).toHaveBeenCalledWith({
@@ -80,37 +77,29 @@ describe('Search Routes Integration Tests', () => {
             fields: ['name^3', 'brand^2', 'description'],
             type: 'best_fields',
             operator: 'or',
-            fuzziness: 'AUTO'
-          }
+            fuzziness: 'AUTO',
+          },
         },
-        size: 20
+        size: 20,
       });
     });
 
     it('should return empty results for no query', async () => {
-      const response = await request(app)
-        .get('/search')
-        .expect(200);
+      const response = await request(app).get('/search').expect(200);
 
       expect(response.body).toEqual({ hits: [] });
       expect(mockClient.search).not.toHaveBeenCalled();
     });
 
     it('should return empty results for empty query string', async () => {
-      const response = await request(app)
-        .get('/search')
-        .query({ q: '' })
-        .expect(200);
+      const response = await request(app).get('/search').query({ q: '' }).expect(200);
 
       expect(response.body).toEqual({ hits: [] });
       expect(mockClient.search).not.toHaveBeenCalled();
     });
 
     it('should return empty results for whitespace-only query', async () => {
-      const response = await request(app)
-        .get('/search')
-        .query({ q: '   ' })
-        .expect(200);
+      const response = await request(app).get('/search').query({ q: '   ' }).expect(200);
 
       expect(response.body).toEqual({ hits: [] });
       expect(mockClient.search).not.toHaveBeenCalled();
@@ -121,10 +110,7 @@ describe('Search Routes Integration Tests', () => {
       const mockResponse = createMockElasticsearchResponse(mockProducts);
       mockClient.search.mockResolvedValue(mockResponse);
 
-      const response = await request(app)
-        .get('/search')
-        .query({ q: 'C++' })
-        .expect(200);
+      const response = await request(app).get('/search').query({ q: 'C++' }).expect(200);
 
       expect(response.body.hits).toHaveLength(1);
       expect(mockClient.search).toHaveBeenCalledWith({
@@ -135,10 +121,10 @@ describe('Search Routes Integration Tests', () => {
             fields: ['name^3', 'brand^2', 'description'],
             type: 'best_fields',
             operator: 'or',
-            fuzziness: 'AUTO'
-          }
+            fuzziness: 'AUTO',
+          },
         },
-        size: 20
+        size: 20,
       });
     });
 
@@ -147,19 +133,16 @@ describe('Search Routes Integration Tests', () => {
       const mockResponse = createMockElasticsearchResponse(mockProducts);
       mockClient.search.mockResolvedValue(mockResponse);
 
-      const response = await request(app)
-        .get('/search')
-        .query({ q: 'café' })
-        .expect(200);
+      const response = await request(app).get('/search').query({ q: 'café' }).expect(200);
 
       expect(response.body.hits).toHaveLength(1);
       expect(mockClient.search).toHaveBeenCalledWith(
         expect.objectContaining({
           query: expect.objectContaining({
             multi_match: expect.objectContaining({
-              query: 'café'
-            })
-          })
+              query: 'café',
+            }),
+          }),
         })
       );
     });
@@ -169,19 +152,16 @@ describe('Search Routes Integration Tests', () => {
       const mockResponse = createMockElasticsearchResponse(mockProducts);
       mockClient.search.mockResolvedValue(mockResponse);
 
-      const response = await request(app)
-        .get('/search')
-        .query({ q: '123' })
-        .expect(200);
+      const response = await request(app).get('/search').query({ q: '123' }).expect(200);
 
       expect(response.body.hits).toHaveLength(1);
       expect(mockClient.search).toHaveBeenCalledWith(
         expect.objectContaining({
           query: expect.objectContaining({
             multi_match: expect.objectContaining({
-              query: '123'
-            })
-          })
+              query: '123',
+            }),
+          }),
         })
       );
     });
@@ -189,10 +169,7 @@ describe('Search Routes Integration Tests', () => {
     it('should use correct field boosting in search query', async () => {
       mockClient.search.mockResolvedValue(createMockElasticsearchResponse([]));
 
-      await request(app)
-        .get('/search')
-        .query({ q: 'test' })
-        .expect(200);
+      await request(app).get('/search').query({ q: 'test' }).expect(200);
 
       expect(mockClient.search).toHaveBeenCalledWith({
         index: 'products',
@@ -202,29 +179,26 @@ describe('Search Routes Integration Tests', () => {
             fields: ['name^3', 'brand^2', 'description'],
             type: 'best_fields',
             operator: 'or',
-            fuzziness: 'AUTO'
-          }
+            fuzziness: 'AUTO',
+          },
         },
-        size: 20
+        size: 20,
       });
     });
 
     it('should limit results to 20 items', async () => {
-      const mockProducts = Array.from({ length: 25 }, (_, i) => 
+      const mockProducts = Array.from({ length: 25 }, (_, i) =>
         createMockProduct({ id: `${i + 1}`, name: `Product ${i + 1}` })
       );
       const mockResponse = createMockElasticsearchResponse(mockProducts);
       mockClient.search.mockResolvedValue(mockResponse);
 
-      const response = await request(app)
-        .get('/search')
-        .query({ q: 'Product' })
-        .expect(200);
+      const response = await request(app).get('/search').query({ q: 'Product' }).expect(200);
 
       expect(response.body.hits).toHaveLength(25); // Mock returns all, but query limits to 20
       expect(mockClient.search).toHaveBeenCalledWith(
         expect.objectContaining({
-          size: 20
+          size: 20,
         })
       );
     });
@@ -232,15 +206,12 @@ describe('Search Routes Integration Tests', () => {
     it('should format response correctly with score and id', async () => {
       const mockProduct = createMockProduct({
         id: 'test-123',
-        name: 'Test Product'
+        name: 'Test Product',
       });
       const mockResponse = createMockElasticsearchResponse([mockProduct]);
       mockClient.search.mockResolvedValue(mockResponse);
 
-      const response = await request(app)
-        .get('/search')
-        .query({ q: 'Test' })
-        .expect(200);
+      const response = await request(app).get('/search').query({ q: 'Test' }).expect(200);
 
       expect(response.body.hits[0]).toEqual({
         id: 'test-123',
@@ -252,7 +223,7 @@ describe('Search Routes Integration Tests', () => {
         manufacturer: 'Test Manufacturer',
         netWeight: '100g',
         status: 'PUBLISHED',
-        updatedAt: expect.any(String)
+        updatedAt: expect.any(String),
       });
     });
 
@@ -260,10 +231,7 @@ describe('Search Routes Integration Tests', () => {
       const emptyResponse = createMockElasticsearchResponse([]);
       mockClient.search.mockResolvedValue(emptyResponse);
 
-      const response = await request(app)
-        .get('/search')
-        .query({ q: 'nonexistent' })
-        .expect(200);
+      const response = await request(app).get('/search').query({ q: 'nonexistent' }).expect(200);
 
       expect(response.body.hits).toHaveLength(0);
       expect(response.body.hits).toEqual([]);
@@ -274,19 +242,16 @@ describe('Search Routes Integration Tests', () => {
       const mockResponse = createMockElasticsearchResponse([]);
       mockClient.search.mockResolvedValue(mockResponse);
 
-      const response = await request(app)
-        .get('/search')
-        .query({ q: longQuery })
-        .expect(200);
+      const response = await request(app).get('/search').query({ q: longQuery }).expect(200);
 
       expect(response.body.hits).toEqual([]);
       expect(mockClient.search).toHaveBeenCalledWith(
         expect.objectContaining({
           query: expect.objectContaining({
             multi_match: expect.objectContaining({
-              query: longQuery
-            })
-          })
+              query: longQuery,
+            }),
+          }),
         })
       );
     });
@@ -298,15 +263,12 @@ describe('Search Routes Integration Tests', () => {
         brand: 'Brand X',
         manufacturer: 'Manufacturer Y',
         netWeight: '250g',
-        status: 'PUBLISHED'
+        status: 'PUBLISHED',
       });
       const mockResponse = createMockElasticsearchResponse([mockProduct]);
       mockClient.search.mockResolvedValue(mockResponse);
 
-      const response = await request(app)
-        .get('/search')
-        .query({ q: 'metadata' })
-        .expect(200);
+      const response = await request(app).get('/search').query({ q: 'metadata' }).expect(200);
 
       const result = response.body.hits[0];
       expect(result.brand).toBe('Brand X');
@@ -324,42 +286,35 @@ describe('Search Routes Integration Tests', () => {
       const mockResponse = createMockElasticsearchResponse([mockProduct]);
       mockClient.search.mockResolvedValue(mockResponse);
 
-      const response = await request(app)
-        .get('/search')
-        .query({ q: 'minimal' })
-        .expect(200);
+      const response = await request(app).get('/search').query({ q: 'minimal' }).expect(200);
 
       expect(response.body.hits[0]).toEqual({
         id: 'minimal-product',
         score: 1.0,
-        name: 'Minimal Product'
+        name: 'Minimal Product',
       });
     });
   });
 
   describe('Query parameter handling', () => {
     it('should handle missing query parameter', async () => {
-      const response = await request(app)
-        .get('/search')
-        .expect(200);
+      const response = await request(app).get('/search').expect(200);
 
       expect(response.body).toEqual({ hits: [] });
     });
 
     it('should handle null query parameter', async () => {
       mockClient.search.mockResolvedValue(createMockElasticsearchResponse([]));
-      
-      const response = await request(app)
-        .get('/search?q=null')
-        .expect(200);
+
+      const response = await request(app).get('/search?q=null').expect(200);
 
       expect(mockClient.search).toHaveBeenCalledWith(
         expect.objectContaining({
           query: expect.objectContaining({
             multi_match: expect.objectContaining({
-              query: 'null'
-            })
-          })
+              query: 'null',
+            }),
+          }),
         })
       );
     });
@@ -367,18 +322,16 @@ describe('Search Routes Integration Tests', () => {
     it('should handle array query parameters', async () => {
       mockClient.search.mockResolvedValue(createMockElasticsearchResponse([]));
 
-      const response = await request(app)
-        .get('/search?q[]=first&q[]=second')
-        .expect(200);
+      const response = await request(app).get('/search?q[]=first&q[]=second').expect(200);
 
       // Should convert array to string
       expect(mockClient.search).toHaveBeenCalledWith(
         expect.objectContaining({
           query: expect.objectContaining({
             multi_match: expect.objectContaining({
-              query: 'first,second'
-            })
-          })
+              query: 'first,second',
+            }),
+          }),
         })
       );
     });

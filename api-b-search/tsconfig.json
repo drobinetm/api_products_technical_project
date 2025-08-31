@@ -29,7 +29,5 @@
     "eslint.config.ts",
     "vitest.config.mts"
   ],
-  "exclude": [
-    "src/public/*"
-  ]
+  "exclude": ["src/public/*"]
 }

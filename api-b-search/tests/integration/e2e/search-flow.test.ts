@@ -1,14 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import express from 'express';
 import request from 'supertest';
-import { 
-  createMockProduct, 
+import {
+  createMockProduct,
   createMockElasticsearchResponse,
   createMockElasticsearchClient,
   createMockRabbitMQMessage,
   createMockRabbitMQConnection,
   createMockRabbitMQChannel,
-  waitFor
 } from '../../support/test-utils.js';
 
 // Mock dependencies
@@ -40,7 +39,7 @@ describe('End-to-End Search Flow', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    
+
     // Setup environment
     process.env.ELASTIC_URL = 'http://localhost:9200';
     process.env.RABBITMQ_URL = 'amqp://localhost:5672';
@@ -61,11 +60,11 @@ describe('End-to-End Search Flow', () => {
     // Setup Elasticsearch mocks
     mockElasticsearchClient.indices.exists.mockResolvedValue(false);
     mockElasticsearchClient.indices.create.mockResolvedValue({});
-    
+
     // Create Express app
     app = express();
     app.use(express.json());
-    
+
     // Import and setup routes
     const { default: searchRoutes } = await import('@/routes/search.js');
     app.use('/', searchRoutes);
@@ -91,14 +90,14 @@ describe('End-to-End Search Flow', () => {
         id: 'e2e-test-123',
         name: 'E2E Test Product',
         brand: 'TestBrand',
-        description: 'A product for end-to-end testing'
+        description: 'A product for end-to-end testing',
       });
 
       const productMessage = createMockRabbitMQMessage(newProduct, 'product.created');
       mockElasticsearchClient.index.mockResolvedValue({
         _id: 'e2e-test-123',
         _version: 1,
-        result: 'created'
+        result: 'created',
       });
 
       // Process the message
@@ -109,7 +108,7 @@ describe('End-to-End Search Flow', () => {
         index: 'products',
         id: 'e2e-test-123',
         document: newProduct,
-        refresh: 'wait_for'
+        refresh: 'wait_for',
       });
       expect(mockRabbitMQChannel.ack).toHaveBeenCalledWith(productMessage);
 
@@ -117,10 +116,7 @@ describe('End-to-End Search Flow', () => {
       const searchResponse = createMockElasticsearchResponse([newProduct]);
       mockElasticsearchClient.search.mockResolvedValue(searchResponse);
 
-      const response = await request(app)
-        .get('/search')
-        .query({ q: 'E2E Test' })
-        .expect(200);
+      const response = await request(app).get('/search').query({ q: 'E2E Test' }).expect(200);
 
       // Verify search results
       expect(response.body.hits).toHaveLength(1);
@@ -134,7 +130,7 @@ describe('End-to-End Search Flow', () => {
         manufacturer: 'Test Manufacturer',
         netWeight: '100g',
         status: 'PUBLISHED',
-        updatedAt: expect.any(String)
+        updatedAt: expect.any(String),
       });
 
       expect(mockElasticsearchClient.search).toHaveBeenCalledWith({
@@ -145,10 +141,10 @@ describe('End-to-End Search Flow', () => {
             fields: ['name^3', 'brand^2', 'description'],
             type: 'best_fields',
             operator: 'or',
-            fuzziness: 'AUTO'
-          }
+            fuzziness: 'AUTO',
+          },
         },
-        size: 20
+        size: 20,
       });
     });
 
@@ -157,18 +153,11 @@ describe('End-to-End Search Flow', () => {
       const { startConsumer } = await import('@/bus/consumer.event.js');
       await startConsumer();
 
-      // Initial product
-      const originalProduct = createMockProduct({
-        id: 'update-test-123',
-        name: 'Original Product Name',
-        brand: 'OriginalBrand'
-      });
-
       // Updated product
       const updatedProduct = createMockProduct({
         id: 'update-test-123',
         name: 'Updated Product Name',
-        brand: 'UpdatedBrand'
+        brand: 'UpdatedBrand',
       });
 
       // Process update message
@@ -176,7 +165,7 @@ describe('End-to-End Search Flow', () => {
       mockElasticsearchClient.index.mockResolvedValue({
         _id: 'update-test-123',
         _version: 2,
-        result: 'updated'
+        result: 'updated',
       });
 
       await messageHandler(updateMessage);
@@ -186,7 +175,7 @@ describe('End-to-End Search Flow', () => {
         index: 'products',
         id: 'update-test-123',
         document: updatedProduct,
-        refresh: 'wait_for'
+        refresh: 'wait_for',
       });
 
       // Search should return updated product
@@ -213,7 +202,7 @@ describe('End-to-End Search Flow', () => {
         took: 30,
         deleted: 100,
         version_conflicts: 0,
-        batches: 1
+        batches: 1,
       });
 
       await messageHandler(clearMessage);
@@ -222,7 +211,7 @@ describe('End-to-End Search Flow', () => {
       expect(mockElasticsearchClient.deleteByQuery).toHaveBeenCalledWith({
         index: 'products',
         query: { match_all: {} },
-        refresh: true
+        refresh: true,
       });
       expect(consoleLogSpy).toHaveBeenCalledWith('Cleared search index');
 
@@ -230,10 +219,7 @@ describe('End-to-End Search Flow', () => {
       const emptySearchResponse = createMockElasticsearchResponse([]);
       mockElasticsearchClient.search.mockResolvedValue(emptySearchResponse);
 
-      const response = await request(app)
-        .get('/search')
-        .query({ q: 'any query' })
-        .expect(200);
+      const response = await request(app).get('/search').query({ q: 'any query' }).expect(200);
 
       expect(response.body.hits).toHaveLength(0);
     });
@@ -249,20 +235,20 @@ describe('End-to-End Search Flow', () => {
           id: 'phone-1',
           name: 'iPhone 15 Pro',
           brand: 'Apple',
-          description: 'Latest iPhone with Pro features'
+          description: 'Latest iPhone with Pro features',
         }),
         createMockProduct({
           id: 'phone-2',
           name: 'Samsung Galaxy S24',
           brand: 'Samsung',
-          description: 'Android flagship phone'
+          description: 'Android flagship phone',
         }),
         createMockProduct({
           id: 'laptop-1',
           name: 'MacBook Pro',
           brand: 'Apple',
-          description: 'Professional laptop for developers'
-        })
+          description: 'Professional laptop for developers',
+        }),
       ];
 
       // Index all products
@@ -271,53 +257,52 @@ describe('End-to-End Search Flow', () => {
         mockElasticsearchClient.index.mockResolvedValue({
           _id: product.id,
           _version: 1,
-          result: 'created'
+          result: 'created',
         });
-        
+
         await messageHandler(message);
         expect(mockElasticsearchClient.index).toHaveBeenCalledWith({
           index: 'products',
           id: product.id,
           document: product,
-          refresh: 'wait_for'
+          refresh: 'wait_for',
         });
       }
 
       // Test 1: Search for "Apple" should return 2 results
       const appleProducts = products.filter(p => p.brand === 'Apple');
-      mockElasticsearchClient.search.mockResolvedValue(createMockElasticsearchResponse(appleProducts));
+      mockElasticsearchClient.search.mockResolvedValue(
+        createMockElasticsearchResponse(appleProducts)
+      );
 
-      let response = await request(app)
-        .get('/search')
-        .query({ q: 'Apple' })
-        .expect(200);
+      let response = await request(app).get('/search').query({ q: 'Apple' }).expect(200);
 
       expect(response.body.hits).toHaveLength(2);
       expect(response.body.hits.every((hit: any) => hit.brand === 'Apple')).toBe(true);
 
       // Test 2: Search for "iPhone" should return 1 result
       const iPhoneProducts = products.filter(p => p.name.includes('iPhone'));
-      mockElasticsearchClient.search.mockResolvedValue(createMockElasticsearchResponse(iPhoneProducts));
+      mockElasticsearchClient.search.mockResolvedValue(
+        createMockElasticsearchResponse(iPhoneProducts)
+      );
 
-      response = await request(app)
-        .get('/search')
-        .query({ q: 'iPhone' })
-        .expect(200);
+      response = await request(app).get('/search').query({ q: 'iPhone' }).expect(200);
 
       expect(response.body.hits).toHaveLength(1);
       expect(response.body.hits[0].name).toContain('iPhone');
 
       // Test 3: Search for "phone" in description should return 2 results (both phones)
       const phoneProducts = products.filter(p => p.description.toLowerCase().includes('phone'));
-      mockElasticsearchClient.search.mockResolvedValue(createMockElasticsearchResponse(phoneProducts));
+      mockElasticsearchClient.search.mockResolvedValue(
+        createMockElasticsearchResponse(phoneProducts)
+      );
 
-      response = await request(app)
-        .get('/search')
-        .query({ q: 'phone' })
-        .expect(200);
+      response = await request(app).get('/search').query({ q: 'phone' }).expect(200);
 
       expect(response.body.hits).toHaveLength(2);
-      expect(response.body.hits.every((hit: any) => hit.description.toLowerCase().includes('phone'))).toBe(true);
+      expect(
+        response.body.hits.every((hit: any) => hit.description.toLowerCase().includes('phone'))
+      ).toBe(true);
     });
 
     it('should handle errors in the flow gracefully', async () => {
@@ -328,7 +313,7 @@ describe('End-to-End Search Flow', () => {
       // Simulate indexing error
       const product = createMockProduct({
         id: 'error-test-123',
-        name: 'Error Test Product'
+        name: 'Error Test Product',
       });
 
       const message = createMockRabbitMQMessage(product, 'product.created');
@@ -346,16 +331,13 @@ describe('End-to-End Search Flow', () => {
       // Search should still work (with different product)
       const searchableProduct = createMockProduct({
         id: 'working-123',
-        name: 'Working Product'
+        name: 'Working Product',
       });
-      
+
       const searchResponse = createMockElasticsearchResponse([searchableProduct]);
       mockElasticsearchClient.search.mockResolvedValue(searchResponse);
 
-      const response = await request(app)
-        .get('/search')
-        .query({ q: 'Working' })
-        .expect(200);
+      const response = await request(app).get('/search').query({ q: 'Working' }).expect(200);
 
       expect(response.body.hits).toHaveLength(1);
       expect(response.body.hits[0].name).toBe('Working Product');
@@ -370,20 +352,20 @@ describe('End-to-End Search Flow', () => {
       const pendingProduct = createMockProduct({
         id: 'approval-test-123',
         name: 'Pending Approval Product',
-        status: 'PENDING'
+        status: 'PENDING',
       });
 
       const createMessage = createMockRabbitMQMessage(pendingProduct, 'product.created');
       mockElasticsearchClient.index.mockResolvedValue({
         _id: 'approval-test-123',
         _version: 1,
-        result: 'created'
+        result: 'created',
       });
 
       await messageHandler(createMessage);
       expect(mockElasticsearchClient.index).toHaveBeenCalledWith(
         expect.objectContaining({
-          document: expect.objectContaining({ status: 'PENDING' })
+          document: expect.objectContaining({ status: 'PENDING' }),
         })
       );
 
@@ -391,20 +373,20 @@ describe('End-to-End Search Flow', () => {
       const approvedProduct = createMockProduct({
         id: 'approval-test-123',
         name: 'Pending Approval Product',
-        status: 'PUBLISHED'
+        status: 'PUBLISHED',
       });
 
       const approvalMessage = createMockRabbitMQMessage(approvedProduct, 'product.approved');
       mockElasticsearchClient.index.mockResolvedValue({
         _id: 'approval-test-123',
         _version: 2,
-        result: 'updated'
+        result: 'updated',
       });
 
       await messageHandler(approvalMessage);
       expect(mockElasticsearchClient.index).toHaveBeenCalledWith(
         expect.objectContaining({
-          document: expect.objectContaining({ status: 'PUBLISHED' })
+          document: expect.objectContaining({ status: 'PUBLISHED' }),
         })
       );
 
@@ -427,21 +409,21 @@ describe('End-to-End Search Flow', () => {
       await startConsumer();
 
       // Create multiple products for concurrent processing
-      const products = Array.from({ length: 10 }, (_, i) => 
+      const products = Array.from({ length: 10 }, (_, i) =>
         createMockProduct({
           id: `concurrent-${i}`,
-          name: `Concurrent Product ${i}`
+          name: `Concurrent Product ${i}`,
         })
       );
 
-      const messages = products.map(product => 
+      const messages = products.map(product =>
         createMockRabbitMQMessage(product, 'product.created')
       );
 
       // Mock successful indexing for all products
       mockElasticsearchClient.index.mockResolvedValue({
         _version: 1,
-        result: 'created'
+        result: 'created',
       });
 
       // Process all messages concurrently
@@ -459,7 +441,7 @@ describe('End-to-End Search Flow', () => {
       const products = [
         createMockProduct({ id: 'success-1', name: 'Success Product 1' }),
         createMockProduct({ id: 'fail-1', name: 'Fail Product 1' }),
-        createMockProduct({ id: 'success-2', name: 'Success Product 2' })
+        createMockProduct({ id: 'success-2', name: 'Success Product 2' }),
       ];
 
       // Mock: first call succeeds, second fails, third succeeds
