@@ -14,23 +14,39 @@ La IA permitió acelerar tareas repetitivas, ofrecer alternativas de diseño y g
 | **ChatGPT (OpenAI)** | Generación de documentación técnica                                                            | Reducción de tiempos de redacción y estandarización del estilo documental |
 | **Winsurf**          | Asistencia en escritura de funciones y snippets de código                                      | Aceleración en la implementación de prototipos y validación de sintaxis   |
 | **Readme-AI**        | Generación de archivos README y reportes técnicos automatizados                                | Aseguró uniformidad y claridad en la documentación inicial                |
-| **Warp**             | Validaciones de comandos y arreglos de problemas en tiempo de ejecución con la infraestructura | Aseguró la ejecución de la infra con docker  |
+| **Warp**             | Validaciones de comandos y arreglos de problemas en tiempo de ejecución con la infraestructura | Aseguró la ejecución de la infra con docker                               |
 
 ---
 
 ## 3. Prompts o interacciones clave
 
-Ejemplos representativos de interacciones con IA:
+### Ejemplos representativos de interacciones con IA
 
 ```markdown
-Prompt a ChatGPT: 
-- 
+Prompt a Winsurf:
+- Remember that you are a senior NodeJS expert with experience in code refactoring and best practices. 
+  The `api-a-core/src/services/productService.js` service has several very long and repetitive functions. 
+  Refactor the code by applying separation of responsibilities, reusing functions, and improving readability. 
+  Give me practical examples of how to divide the logic into reusable services.
 ```
 
 ```markdown
 Prompt a Winsurf:
--
+- Implement a simpler concept under the `api-a-core/src/bus/publisher.js` layer so that you can easily control the RabbitMQ channel.
 ```
+
+```markdown
+Prompt a Winsurf:
+- mmmm, you can use a strategy pattern on the same service by removing BaseService and EventService. Remember that the concept is simple.
+```
+
+### Imágenes de Ejemplos
+
+<img src="resources/images/ai/iteration_1.1.png" width="500" height="506" alt="Iteration 1.1">
+<img src="resources/images/ai/iteration_1.2.png" width="500" height="506" alt="Iteration 1.2">
+<img src="resources/images/ai/iteration_1.3.png" width="500" height="506" alt="Iteration 1.3">
+<img src="resources/images/ai/iteration_2.1.png" width="500" height="506" alt="Iteration 2.1">
+<img src="resources/images/ai/iteration_2.2.png" width="500" height="506" alt="Iteration 2.2">
 
 ---
 
