@@ -2,6 +2,8 @@
 
 Un sistema de gestión de productos basado en microservicios con API GraphQL, indexación en tiempo real mediante RabbitMQ y capacidades de búsqueda con Elasticsearch.
 
+[Reporte sobre el uso de Agentes de IA](IA-report.md)
+
 ## Arquitectura
 
 - **API-A-Core**: API GraphQL para gestión de productos (Node.js)
@@ -39,7 +41,21 @@ Asegúrate de tener instalado:
 
 ## Ejecutando la Aplicación
 
-### Opción 1: Local
+### Opción 1: Docker (Correr los servicios en contenedores Docker)
+
+```bash
+# Iniciar todos los servicios con docker
+docker-compose up --build -d
+
+# Verificar estado de los servicios
+docker-compose ps
+
+# Ejecutar datos de prueba
+chmod +x resources/seed.sh
+./resources/seed.sh
+```
+
+### Opción 2: Local
 
 #### Configuración del Entorno
 
@@ -110,21 +126,7 @@ chmod +x resources/seed.sh
 ```
 
 > [!NOTE]
-> Si no prefieres la configuración manual o no estás usando Linux, usa la versión con Docker:
-
-### Opción 2: Docker (Correr los servicios en contenedores Docker)
-
-```bash
-# Iniciar todos los servicios con docker
-docker-compose up --build -d
-
-# Verificar estado de los servicios
-docker-compose ps
-
-# Ejecutar datos de prueba
-chmod +x resources/seed.sh
-./resources/seed.sh
-```
+> Si no prefieres la configuración manual o no estás usando Linux, usa la versión con Docker
 
 ## Endpoints de la API
 
