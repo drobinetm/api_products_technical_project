@@ -1,7 +1,7 @@
 import Product from '@/models/Product.js';
 import { logChange } from '@/services/audit.service.js';
 import { publishEvent } from '@/bus/publisher.event.js';
-import { EVENT_TYPES, productEventPayload } from '@/shared/events.js';
+import { EVENT_TYPES, productEventPayload } from 'shared/events.js';
 import createError from 'http-errors';
 
 // Constants

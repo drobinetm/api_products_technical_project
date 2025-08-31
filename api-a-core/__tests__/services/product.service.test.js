@@ -26,13 +26,13 @@ jest.mock('@/bus/publisher.event.js', () => ({
   publishEvent: jest.fn(),
 }));
 
-jest.mock('@/shared/events.js', () => ({
+jest.mock('shared/events.js', () => ({
   __esModule: true,
   EVENT_TYPES: {
-    PRODUCT_CREATED: 'PRODUCT_CREATED',
-    PRODUCT_UPDATED: 'PRODUCT_UPDATED',
-    PRODUCT_APPROVED: 'PRODUCT_APPROVED',
-    PRODUCTS_CLEARED: 'PRODUCTS_CLEARED',
+    PRODUCT_CREATED: 'product.created',
+    PRODUCT_UPDATED: 'product.updated',
+    PRODUCT_APPROVED: 'product.approved',
+    PRODUCTS_CLEARED: 'product.cleared',
   },
   productEventPayload: jest.fn((data) => ({ wrapped: data })),
 }));
@@ -41,7 +41,7 @@ jest.mock('@/shared/events.js', () => ({
 import Product from '@/models/Product.js';
 import { logChange } from '@/services/audit.service.js';
 import { publishEvent } from '@/bus/publisher.event.js';
-import { EVENT_TYPES, productEventPayload } from '@/shared/events.js';
+import { EVENT_TYPES, productEventPayload } from 'shared/events.js';
 import ProductService from '@/services/product.service.js';
 
 

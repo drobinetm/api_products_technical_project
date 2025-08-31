@@ -2,7 +2,8 @@ module.exports = {
   testEnvironment: 'node',
   transform: {},
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1'
+    '^@/(.*)$': '<rootDir>/src/$1',
+    '^shared/(.*)$': '<rootDir>/../shared/$1'
   },
   moduleFileExtensions: ['js', 'json'],
   testMatch: ['**/__tests__/**/*.test.js'],
