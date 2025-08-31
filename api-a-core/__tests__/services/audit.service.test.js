@@ -1,20 +1,20 @@
 import { jest } from '@jest/globals';
 
 // Mock the AuditLog model
-jest.mock('@/models/AuditLog.js', () => {
-  return {
-    __esModule: true,
-    default: {
-      create: jest.fn(),
-      find: jest.fn(),
-      deleteMany: jest.fn(),
-    },
-  };
-});
+jest.mock('@/models/AuditLog.js', () => ({
+  __esModule: true,
+  default: {
+    create: jest.fn(),
+    find: jest.fn(),
+    deleteMany: jest.fn(),
+  },
+}));
 
 // Import the mocks
 import AuditLog from '@/models/AuditLog.js';
 import { logChange, getAuditLogs, clearAuditLogs } from '@/services/audit.service.js';
+
+const mockAuditLog = jest.mocked(AuditLog);
 
 describe('Audit Service', () => {
   let consoleErrorSpy;
@@ -42,10 +42,14 @@ describe('Audit Service', () => {
       const createdLog = {
         _id: 'audit123',
         ...auditData,
+        timestamp: expect.any(Date),
         save: jest.fn().mockResolvedValue(true),
       };
 
-      AuditLog.create.mockResolvedValueOnce(createdLog);
+      // Use jest.spyOn and mockImplementation
+      jest.spyOn(AuditLog, 'create').mockImplementation(async (data) => {
+        return Promise.resolve(createdLog);
+      });
 
       // Act
       const result = await logChange(auditData);
@@ -65,7 +69,9 @@ describe('Audit Service', () => {
     it('should handle errors when creating audit log', async () => {
       // Arrange
       const error = new Error('Database error');
-      AuditLog.create.mockRejectedValueOnce(error);
+      jest.spyOn(AuditLog, 'create').mockImplementation(async () => {
+        throw error;
+      });
 
       // Act & Assert
       await expect(
@@ -90,11 +96,11 @@ describe('Audit Service', () => {
         { _id: '2', action: 'UPDATE' },
       ];
 
-      AuditLog.find.mockReturnValueOnce({
+      jest.spyOn(AuditLog, 'find').mockImplementation(() => ({
         sort: jest.fn().mockReturnValue({
           lean: jest.fn().mockResolvedValue(mockLogs),
         }),
-      });
+      }));
 
       // Act
       const result = await getAuditLogs(productId);
@@ -107,11 +113,11 @@ describe('Audit Service', () => {
     it('should handle errors when retrieving audit logs', async () => {
       // Arrange
       const error = new Error('Database error');
-      AuditLog.find.mockReturnValueOnce({
+      jest.spyOn(AuditLog, 'find').mockImplementation(() => ({
         sort: jest.fn().mockReturnValue({
           lean: jest.fn().mockRejectedValue(error),
         }),
-      });
+      }));
 
       // Act & Assert
       await expect(getAuditLogs('123')).rejects.toThrow('Failed to retrieve audit logs');
@@ -123,7 +129,9 @@ describe('Audit Service', () => {
     it('should clear all audit logs', async () => {
       // Arrange
       const deleteResult = { deletedCount: 5 };
-      AuditLog.deleteMany.mockResolvedValueOnce(deleteResult);
+      jest.spyOn(AuditLog, 'deleteMany').mockImplementation(async () => {
+        return Promise.resolve(deleteResult);
+      });
 
       // Act
       const result = await clearAuditLogs();
@@ -136,7 +144,9 @@ describe('Audit Service', () => {
     it('should handle errors when clearing audit logs', async () => {
       // Arrange
       const error = new Error('Database error');
-      AuditLog.deleteMany.mockRejectedValueOnce(error);
+      jest.spyOn(AuditLog, 'deleteMany').mockImplementation(async () => {
+        throw error;
+      });
 
       // Act & Assert
       await expect(clearAuditLogs()).rejects.toThrow('Failed to clear audit logs');

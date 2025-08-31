@@ -12,19 +12,6 @@
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch"
   },
-  "jest": {
-    "testEnvironment": "node",
-    "transform": {},
-    "extensionsToTreatAsEsm": [
-      ".js"
-    ],
-    "moduleNameMapper": {
-      "^@/(.*)$": "<rootDir>/src/$1"
-    },
-    "testMatch": [
-      "**/__tests__/**/*.test.js"
-    ]
-  },
   "dependencies": {
     "@graphql-tools/schema": "^10.0.0",
     "ajv": "^8.17.1",
