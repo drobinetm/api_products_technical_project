@@ -1,4 +1,21 @@
-# IA-REPORT.md
+<div align="center">
+    <a href="https://github.com/drobinetm/api_products_technical_project/">
+        <img src="https://tse3.mm.bing.net/th/id/OIP.6jD2GfSpso6aXJpWif8pZAHaHa?r=0&w=474&h=474&c=7&p=0" alt="bot AI" style="width:96px; height:72px; vertical-align:middle; border-radius: 10px;">
+        <h1>Reporte sobre el uso de Agentes de IA</h1>
+    </a>
+    <!-- WinSurf -->
+    <a href="https://winsurf.com/">
+      <img src="https://img.shields.io/badge/WinSurf-1E90FF?logo=windows&logoColor=white" alt="WinSurf">
+    </a>    
+    <!-- ChatGPT -->
+    <a href="https://chat.openai.com/">
+      <img src="https://img.shields.io/badge/ChatGPT-74aa9c?logo=openai&logoColor=white" alt="ChatGPT">
+    </a>    
+    <!-- Warp (terminal) -->
+    <a href="https://warp.dev/">
+      <img src="https://img.shields.io/badge/Warp-01A4FF?logo=warp&logoColor=white" alt="Warp">
+    </a>
+</div>
 
 ## 1. Introducción
 
