@@ -6,26 +6,21 @@ This project was created with [express-generator-typescript](https://github.com/
 
 Run all unit-tests.
 
-
 ### `npm test -- "name of test file" (i.e. users).`
 
 Run a single unit-test.
-
 
 ### `npm run lint`
 
 Check for linting errors.
 
-
 ### `npm run build`
 
 Build the project for production.
 
-
 ### `npm start`
 
 Run the production build (Must be built first).
-
 
 ### `npm run type-check`
 
