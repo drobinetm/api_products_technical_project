@@ -74,6 +74,34 @@ Asegúrate de tener instalado:
 - Utiliza GraphQL Playground en `http://localhost:4000/graphql` para pruebas interactivas de API
 - Los mensajes de RabbitMQ son persistentes y se reprocesarán si los consumidores se reinician
 
+## Ejecución de Pruebas Unitarias
+
+### api-a-core
+Para ejecutar las pruebas unitarias en el proyecto api-a-core, utiliza el siguiente comando:
+
+```bash
+cd api-a-core
+npm test
+```
+
+### api-b-search
+Para ejecutar las pruebas unitarias en el proyecto api-b-search, primero debes configurar el entorno de pruebas:
+
+```bash
+# Crear directorio de configuración si no existe
+mkdir -p api-b-search/config
+
+# Copiar el archivo de configuración de ejemplo
+cp api-b-search/test.env.example api-b-search/config/.env.test
+```
+
+Luego, ejecuta las pruebas con:
+
+```bash
+cd api-b-search
+npm test
+```
+
 ## Validación de Código
 
 El proyecto incluye un script de validación que ejecuta las siguientes tareas para ambos proyectos (api-a-core y api-b-search):
