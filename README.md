@@ -24,7 +24,7 @@
    <a href="https://www.elastic.co/kibana/">
      <img src="https://img.shields.io/badge/Kibana-8.14.3-005571?logo=kibana&logoColor=white" alt="Kibana 8.14.3">
    </a>
-   <a href="https://raw.githubusercontent.com/drobinetm/api_products_technical_project/main/LICENSE">
+   <a href="https://github.com/drobinetm/api_products_technical_project?tab=MIT-1-ov-file#readme">
     <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT license">
    </a>
 </div>
