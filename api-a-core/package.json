@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "type": "module",
   "main": "src/app.js",
+  "_moduleAliases": {
+    "@": "./src"
+  },
   "scripts": {
     "dev": "nodemon src/app.js",
     "start": "node src/app.js",
@@ -20,6 +23,7 @@
     "graphql-type-json": "^0.3.2",
     "http-errors": "^2.0.0",
     "jsonwebtoken": "^9.0.2",
+    "module-alias": "^2.2.3",
     "mongoose": "^8.6.0"
   },
   "devDependencies": {

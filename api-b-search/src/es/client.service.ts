@@ -16,6 +16,7 @@ async function createIndexWithSettings() {
             analysis: {
                 analyzer: {
                     folding_analyzer: {
+                        type: 'custom',
                         tokenizer: 'standard',
                         filter: ['lowercase', 'asciifolding']
                     }
