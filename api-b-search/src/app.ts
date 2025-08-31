@@ -12,9 +12,9 @@ moduleAlias.addAliases({
 });
 
 import express from 'express';
-import searchRoutes from '@/routes/search.js';
-import { ensureIndex } from '@/es/client.service.js';
-import { startConsumer } from '@/bus/consumer.event.js';
+import searchRoutes from './routes/search.js';
+import { ensureIndex } from './es/client.service.js';
+import { startConsumer } from './bus/consumer.event.js';
 
 async function main() {
     const app = express();

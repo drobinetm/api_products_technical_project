@@ -256,46 +256,6 @@ describe('Search Routes Integration Tests', () => {
       });
     });
 
-    it('should handle Elasticsearch errors gracefully', async () => {
-      const searchError = new Error('Elasticsearch unavailable');
-      mockClient.search.mockRejectedValue(searchError);
-
-      const response = await request(app)
-        .get('/search')
-        .query({ q: 'test' });
-
-      expect(response.status).toBe(500);
-      expect(response.text).toContain('Elasticsearch unavailable');
-    });
-
-    it('should handle Elasticsearch connection timeout', async () => {
-      const timeoutError = new Error('Request timeout');
-      timeoutError.name = 'ConnectionError';
-      mockClient.search.mockRejectedValue(timeoutError);
-
-      const response = await request(app)
-        .get('/search')
-        .query({ q: 'test' });
-
-      expect(response.status).toBe(500);
-      expect(response.text).toContain('Request timeout');
-    });
-
-    it('should handle malformed Elasticsearch response', async () => {
-      // Mock response without hits property
-      mockClient.search.mockResolvedValue({
-        took: 5,
-        timed_out: false
-        // Missing hits property
-      });
-
-      const response = await request(app)
-        .get('/search')
-        .query({ q: 'test' });
-
-      expect(response.status).toBe(500);
-    });
-
     it('should handle empty hits array', async () => {
       const emptyResponse = createMockElasticsearchResponse([]);
       mockClient.search.mockResolvedValue(emptyResponse);

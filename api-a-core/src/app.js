@@ -8,16 +8,17 @@ import moduleAlias from 'module-alias';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 moduleAlias.addAliases({
-  '@': path.join(__dirname, '.')
+  '@': path.join(__dirname, '.'),
+  'shared': '/shared'
 });
 
 import express from 'express';
-import { auth } from '@/middleware/auth.js';
-import { connectMongo } from '@/utils/connect.mongo.util.js';
+import { auth } from './middleware/auth.js';
+import { connectMongo } from './utils/connect.mongo.util.js';
 import { readFileSync } from 'fs';
 import { createHandler } from 'graphql-http/lib/use/express';
 import { makeExecutableSchema } from '@graphql-tools/schema';
-import resolvers from '@/graphql/resolvers.js';
+import resolvers from './graphql/resolvers.js';
 
 const typeDefs = readFileSync(new URL('./graphql/schema.graphql', import.meta.url), 'utf8');
 const schema = makeExecutableSchema({ typeDefs, resolvers });

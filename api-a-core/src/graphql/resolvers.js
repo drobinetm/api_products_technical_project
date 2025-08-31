@@ -1,5 +1,5 @@
 import { GraphQLJSON } from 'graphql-type-json';
-import productService from '@/services/product.service.js';
+import productService from '../services/product.service.js';
 
 /**
  * GraphQL resolvers for the Product type and related operations
